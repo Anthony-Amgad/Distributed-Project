@@ -11,6 +11,7 @@ using System.Text;
 public class PlayerMovement : MonoBehaviour
 {
 
+    public int playerCount;
     public Rigidbody rb;
     public Material[] materials;
     Renderer rend;
@@ -20,7 +21,7 @@ public class PlayerMovement : MonoBehaviour
     private void Start() {
         rend = GetComponent<Renderer>();
         rend.enabled = true;
-        rend.sharedMaterial = materials[0];
+        rend.sharedMaterial = materials[playerCount];
 
     }
 

@@ -6,14 +6,23 @@ using UnityEngine;
 
 public class TCPTestClient : MonoBehaviour {  	
 
+	private Vector3[] positions = {new Vector3((float)2.2, (float)1.1, 0),
+          new Vector3((float)-2.7, (float)1.1, 0),
+          new Vector3((float)-7.8, (float)1.1, 0),
+          new Vector3((float)7.4, (float)1.1, 0)};
 	private TcpClient socketConnection; 
 
-	private NetworkStream nwStream;	
+	private NetworkStream nwStream;
 
-	public Transform Player;
+	public PlayerMovement playerScript;
 
-	public Transform Opp;
-	private String Oppos = "(0.0,11.32,0)";
+	public Transform MainPlayerTrans;
+
+	public GameObject MainPlayerObject;
+
+	public Transform[] Players;
+
+	private String Positions = "['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)']";
 
 	float timeToGo;
 	const float timeOffset = 0.02f;
@@ -30,6 +39,12 @@ public class TCPTestClient : MonoBehaviour {
 		catch (Exception e) { 			
 			Debug.Log("On client connect exception " + e); 		
 		}
+		byte[] bytesToRead = new byte[socketConnection.ReceiveBufferSize];
+		int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
+		//Debug.Log(Encoding.ASCII.GetString(bytesToRead, 0, bytesRead));
+		playerScript.playerCount = int.Parse(Encoding.ASCII.GetString(bytesToRead, 0, bytesRead));
+		MainPlayerTrans.position = positions[playerScript.playerCount];
+		MainPlayerObject.SetActive(true);
 		Thread thread = new Thread(new ThreadStart(Listen));
         thread.Start();
 		    
@@ -41,7 +56,7 @@ public class TCPTestClient : MonoBehaviour {
 			byte[] bytesToRead = new byte[socketConnection.ReceiveBufferSize];
 			int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
 			Debug.Log("Received : " + Encoding.ASCII.GetString(bytesToRead, 0, bytesRead));
-			Oppos = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+			Positions = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
 		}	
 	}
 	
@@ -49,7 +64,7 @@ public class TCPTestClient : MonoBehaviour {
 	void FixedUpdate() {
 		try{
 			if (Time.fixedTime >= timeToGo) {
-			byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes(Player.position.ToString());
+			byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes(MainPlayerTrans.position.ToString());
 			nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 			timeToGo = Time.fixedTime + timeOffset;
 			}
@@ -58,7 +73,13 @@ public class TCPTestClient : MonoBehaviour {
 			Debug.Log(e.Message);
 		}
 
-		Opp.position = Vector3FromString(Oppos);
+		String[] tempos = StringsArrayFromString(Positions);
+		Debug.Log(tempos.Length);
+		for(int i = 0; i < tempos.Length; i += 2){
+			if((i/2) != playerScript.playerCount){
+				Players[i/2].position = Vector3FromString(tempos[i]);
+			}
+		}
 	}
 		
 	
@@ -85,6 +106,14 @@ public class TCPTestClient : MonoBehaviour {
    		outVector.z = float.Parse(splitString[2]);
    
 		return outVector;
+	}
+
+	String[] StringsArrayFromString(String MainString){
+		String outString;
+		String[] splitString = {};
+		outString = MainString.Substring(2, MainString.Length -3);
+		splitString = outString.Split("','"[0]);
+		return splitString;
 	}
 
 }
