@@ -6,27 +6,28 @@ positions = ['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)
 count = 0
 state = []
 playerSockets = []
-starting = False
-started = False
+
 
 def on_new_client(clientsocket,addr,num):
     connected = True
     state.append("waiting")
     while connected :
         try:
-            if started:
-                msg = clientsocket.recv(1024).decode('utf-8')
-                print(addr, ' >> ', msg , ' >> ', len(msg))
-                if len(msg) != 0:
-                    positions[num] = msg
+            msg = clientsocket.recv(1024).decode('utf-8')
+            m1,m2 = msg.split('$')
+            if m1 == "start":
+                for p in playerSockets:
+                    p.send(("start$").encode('utf-8'))
+            elif m1 == "pos":
+                print(addr, ' >> ', m2 , ' >> ', len(m2))
+                if len(m2) != 0:
+                    positions[num] = m2
                 msg = str(positions)
                 clientsocket.send(msg.encode('utf-8'))
-            elif starting:
-                pass
-            else:
-                msg = clientsocket.recv(1024).decode('utf-8')
+                    
         except:
             connected = False
+            print("dis"+str(num))
     clientsocket.close()
 
 
@@ -65,5 +66,5 @@ while True:
         for p in playerSockets:
             p.send(("join$" + name).encode('utf-8'))
         playerSockets.append(c)
-        _thread.start_new_thread(on_new_client,(c,addr,count))
+        _thread.start_new_thread(on_new_client,(c,addr,len(names) - 1))
     s.close() 

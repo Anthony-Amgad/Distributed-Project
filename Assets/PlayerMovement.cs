@@ -21,7 +21,7 @@ public class PlayerMovement : MonoBehaviour
     private void Start() {
         rend = GetComponent<Renderer>();
         rend.enabled = true;
-        rend.sharedMaterial = materials[playerCount];
+        rend.sharedMaterial = materials[PlayerPrefs.GetInt("playerCount")];
 
     }
 

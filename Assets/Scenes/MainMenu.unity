@@ -1588,7 +1588,7 @@ GameObject:
   - component: {fileID: 507591537}
   m_Layer: 0
   m_Name: SecondServerSocket
-  m_TagString: Untagged
+  m_TagString: SSS
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5514,6 +5514,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76153359af8e57f489a516f57a49ee7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameStartBtn: {fileID: 2110686644}
 --- !u!1 &1970444399
 GameObject:
   m_ObjectHideFlags: 0
@@ -6031,7 +6032,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2110686645}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1967531264}
+        m_TargetAssemblyTypeName: LobbyScreenScript, Assembly-CSharp
+        m_MethodName: StartGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2110686645
 MonoBehaviour:
   m_ObjectHideFlags: 0

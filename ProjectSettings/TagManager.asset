@@ -6,6 +6,11 @@ TagManager:
   tags:
   - MainPlayer
   - PlayerNameTag
+  - SSS
+  - Player1Car
+  - Player2Car
+  - Player3Car
+  - Player4Car
   layers:
   - Default
   - TransparentFX
