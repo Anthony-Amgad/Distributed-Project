@@ -21,7 +21,7 @@ public class PlayerMovement : MonoBehaviour
      private int diststore = 1010;
      private bool rflag = true;
 
-     const float timeOffset = 15;
+     const float timeOffset = 5;
      float timeToGo;
 
      private void Start() {
@@ -63,7 +63,7 @@ public class PlayerMovement : MonoBehaviour
                btnins[25-i] = btnins[rndint];
                btnins[rndint] = temp;
           }
-          Debug.Log(keys[0]+keys[1]+keys[2]+keys[3]);
+          FindObjectOfType<GameManagerScript>().updateKeyGUI(keys);
           timeToGo = Time.fixedTime + timeOffset;
      }
 
