@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
      public Material[] materials;
      Renderer rend;
      private float forwardForce = 2000f;
-     private float sidewaysForce = 150f;
+     private float sidewaysForce = 100f;
 
      private int diststore = 1010;
      private bool rflag = true;
@@ -33,7 +33,7 @@ public class PlayerMovement : MonoBehaviour
 
      void FixedUpdate()
      {       
-     if( Input.GetKey(keys[0]) ){
+     if( Input.GetKey(keys[0]) && rb.velocity.z < 75){
           rb.AddForce(0, 0, forwardForce * Time.deltaTime);
      }
      if( Input.GetKey(keys[1]) ){
@@ -42,8 +42,11 @@ public class PlayerMovement : MonoBehaviour
      if( Input.GetKey(keys[2]) ){
           rb.AddForce(-1 * sidewaysForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
      }
-     if( Input.GetKey(keys[3]) ){
+     if( Input.GetKey(keys[3]) && rb.velocity.z > -25){
           rb.AddForce(0, 0, -1 * forwardForce * Time.deltaTime);
+     }
+     if( (Input.GetKey(keys[1]) ||  Input.GetKey(keys[2])) && (rb.velocity.z > 0) ){
+          rb.AddForce(0, 0, -1 * 100 * Time.deltaTime);
      }
      if(trans.position.z > diststore){
           if(rflag){
@@ -55,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
           rflag = !rflag;
      }
      if (Time.fixedTime >= timeToGo) {
-          System.Random rnd = new System.Random();
+          System.Random rnd = new System.Random(Guid.NewGuid().GetHashCode());
           for(int i = 0; i < 4; i++){
                int rndint = rnd.Next(0,26-i);
                keys[i] = btnins[rndint];

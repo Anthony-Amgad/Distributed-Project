@@ -34,11 +34,12 @@ public class SecondServerSocketScript : MonoBehaviour {
 	public GameObject MainPlayerObject;
 
 	public Transform[] Players;
+	private int playernum;
 
 	private String Positions = "['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)']";
 
 	float timeToGo;
-	const float timeOffset = 0.02f;
+	const float timeOffset = 0.01f;
 
 	private int PORT_NO = 0;
     private string SERVER_IP = "";
@@ -65,6 +66,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 			int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
 			String[] msg = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead).Split("$"[0]);
 			PlayerPrefs.SetInt("playerCount",int.Parse(msg[0]));
+			playernum = int.Parse(msg[0]);
 			PlayerPrefs.SetString("Players", msg[1]);
 			Thread thread = new Thread(new ThreadStart(Listen));
 			thread.Start();
@@ -107,7 +109,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 		}	
 	}
 	
-	//sending position every 0.02 second **NEEDS LOWERING MOST RROB
+	//sending position every 0.01 second **NEEDS LOWERING MOST RROB
 	void FixedUpdate() {
 		if(raceStarted){
 			try{
@@ -120,11 +122,12 @@ public class SecondServerSocketScript : MonoBehaviour {
 				Debug.Log(e.Message);
 			}
 			String[] tempos = StringsArrayFromString(Positions);
-			//Debug.Log(Positions);
-			//Debug.Log(tempos.Length);
-			for(int i = 0; i < tempos.Length; i += 2){
-				if((i/2) != PlayerPrefs.GetInt("playerCount")){
-					Players[i/2].position = Vector3FromString(tempos[i]);
+			Debug.Log(Positions);
+			Debug.Log(tempos.Length);
+			Debug.Log(tempos[0]+"||"+tempos[1]+"||"+tempos[2]+"||"+tempos[3]+"||"+tempos[4]+"||"+tempos[5]+"||"+tempos[6]+"||"+tempos[7]);
+			for(int i = 0; i < tempos.Length; i+=2){
+				if((i/2) != playernum){
+					Players[(i/2)].position = Vector3FromString(tempos[i]);
 				}
 			}
 		}

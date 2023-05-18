@@ -19,7 +19,7 @@ def on_new_client(clientsocket,addr,num):
                 for p in playerSockets:
                     p.send(("start$").encode('utf-8'))
             elif m1 == "pos":
-                print(addr, ' >> ', m2 , ' >> ', len(m2))
+                #print(addr, ' >> ', m2 , ' >> ', len(m2))
                 if len(m2) != 0:
                     positions[num] = m2
                 msg = str(positions)
@@ -62,9 +62,11 @@ while True:
         names.append(name)
         s.send(("name$" + name).encode('utf-8'))
         s.recv(1024).decode('utf-8')
-        c.send((str(len(names) - 1) + "$" + str(names)).encode('utf-8'))
+        c.send((str(len(playerSockets)) + "$" + str(names)).encode('utf-8'))
+        print(len(playerSockets))
         for p in playerSockets:
             p.send(("join$" + name).encode('utf-8'))
         playerSockets.append(c)
-        _thread.start_new_thread(on_new_client,(c,addr,len(names) - 1))
+        print(len(playerSockets) - 1)
+        _thread.start_new_thread(on_new_client,(c,addr,len(playerSockets) - 1))
     s.close() 
