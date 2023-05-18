@@ -12,10 +12,10 @@ public class SecondServerSocketScript : MonoBehaviour {
 
     static SecondServerSocketScript instance;
 	public bool ready { get; private set;}
-	private Vector3[] positions = {new Vector3((float)2.2, (float)1.1, 0),
-          new Vector3((float)-2.7, (float)1.1, 0),
-          new Vector3((float)-7.8, (float)1.1, 0),
-          new Vector3((float)7.4, (float)1.1, 0)};
+	private Vector3[] positions = {new Vector3((float)2.2, (float)1.5, 0),
+          new Vector3((float)-2.7, (float)1.5, 0),
+          new Vector3((float)-7.8, (float)1.5, 0),
+          new Vector3((float)7.4, (float)1.5, 0)};
 	private TcpClient socketConnection;
 	
 	public List<String> PlayersNames;
