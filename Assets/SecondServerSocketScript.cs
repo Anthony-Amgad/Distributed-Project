@@ -120,7 +120,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 				Debug.Log(e.Message);
 			}
 			String[] tempos = StringsArrayFromString(Positions);
-			Debug.Log(Positions);
+			//Debug.Log(Positions);
 			//Debug.Log(tempos.Length);
 			for(int i = 0; i < tempos.Length; i += 2){
 				if((i/2) != PlayerPrefs.GetInt("playerCount")){

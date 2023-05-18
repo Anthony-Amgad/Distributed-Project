@@ -1,41 +1,72 @@
 using UnityEngine;
-
-// A C# program for Client
 using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
- 
+
 
 
 public class PlayerMovement : MonoBehaviour
 {
 
-    public int playerCount;
-    public Rigidbody rb;
-    public Material[] materials;
-    Renderer rend;
-    private float forwardForce = 2000f;
-    private float sidewaysForce = 150f;
+     public string[] keys = {"`","`","`","`"};
+     public Rigidbody rb;
 
-    private void Start() {
-        rend = GetComponent<Renderer>();
-        rend.enabled = true;
-        rend.sharedMaterial = materials[PlayerPrefs.GetInt("playerCount")];
+     public string[] btnins = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"};
+     public Transform trans;
+     public Transform road1;
+     public Transform road2;
+     public Material[] materials;
+     Renderer rend;
+     private float forwardForce = 2000f;
+     private float sidewaysForce = 150f;
 
-    }
+     private int diststore = 1010;
+     private bool rflag = true;
 
-    void FixedUpdate()
-    {
-       
-       if( Input.GetKey("w") ){
-            rb.AddForce(0, 0, forwardForce * Time.deltaTime);
-       }
-       if( Input.GetKey("d") ){
-            rb.AddForce(sidewaysForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
-       }
-       if( Input.GetKey("a") ){
-            rb.AddForce(-1 * sidewaysForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
-       }
-    }
+     const float timeOffset = 15;
+     float timeToGo;
+
+     private void Start() {
+          rend = GetComponent<Renderer>();
+          rend.enabled = true;
+          rend.sharedMaterial = materials[PlayerPrefs.GetInt("playerCount")];
+          timeToGo = Time.fixedTime;
+     }
+
+     void FixedUpdate()
+     {       
+     if( Input.GetKey(keys[0]) ){
+          rb.AddForce(0, 0, forwardForce * Time.deltaTime);
+     }
+     if( Input.GetKey(keys[1]) ){
+          rb.AddForce(sidewaysForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
+     }
+     if( Input.GetKey(keys[2]) ){
+          rb.AddForce(-1 * sidewaysForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
+     }
+     if( Input.GetKey(keys[3]) ){
+          rb.AddForce(0, 0, -1 * forwardForce * Time.deltaTime);
+     }
+     if(trans.position.z > diststore){
+          if(rflag){
+               road1.localPosition = new Vector3(road1.localPosition.x, road1.localPosition.y, road1.localPosition.z + 2000);
+          }else{
+               road2.localPosition = new Vector3(road2.localPosition.x, road2.localPosition.y, road2.localPosition.z + 2000);
+          }
+          diststore+=1000;
+          rflag = !rflag;
+     }
+     if (Time.fixedTime >= timeToGo) {
+          System.Random rnd = new System.Random();
+          for(int i = 0; i < 4; i++){
+               int rndint = rnd.Next(0,26-i);
+               keys[i] = btnins[rndint];
+               string temp = btnins[25-i];
+               btnins[25-i] = btnins[rndint];
+               btnins[rndint] = temp;
+          }
+          Debug.Log(keys[0]+keys[1]+keys[2]+keys[3]);
+          timeToGo = Time.fixedTime + timeOffset;
+     }
+
+
+     }
 }
