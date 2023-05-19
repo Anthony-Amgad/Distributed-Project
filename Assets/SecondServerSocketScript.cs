@@ -145,6 +145,9 @@ public class SecondServerSocketScript : MonoBehaviour {
 		}
 		if(cR){
 			Debug.Log(chatSender+chatMessage);
+			if(!raceStarted){
+				FindObjectOfType<LobbyScreenScript>().chatView(chatSender,chatMessage);
+			}
 			// FindObjectOfType<>.
 			cR = false;
 		}	

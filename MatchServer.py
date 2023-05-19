@@ -7,7 +7,7 @@ PlayingGameServers = {"0":['0','0','0','0']}
 s = socket.socket()
 host = socket.gethostname()
 port=50001
-OfflineGameServers = {"0", '192.168.56.1#50000'}
+OfflineGameServers = {"0", '127.0.0.1#50000'}
 #ygf ip 192.168.1.32
 #antoon ip 192.168.56.1
 

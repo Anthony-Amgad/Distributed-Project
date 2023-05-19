@@ -11,7 +11,8 @@ public class LobbyScreenScript : MonoBehaviour
 {
 
     public InputField ChatInputField; 
-
+    public Transform Content;
+    public GameObject ChatCard;
     GameObject[] PlayerNameTags;
     List<String> Names;
 
@@ -62,6 +63,14 @@ public class LobbyScreenScript : MonoBehaviour
         }
     }
 
+    public void chatView(string sender, string message){
+        GameObject card = Instantiate(ChatCard,Content);
+        Text text = card.GetComponentInChildren<Text>();
+        Debug.Log("sheesh");
+        text.text = sender + ": "+message;
+        // text.text = Users.Length + "/4";
+        // card.GetComponent<LobbyCardScript>().server = details[0].Substring(1,details[0].Length-2);
+    }
     List<String> StringsListFromString(String MainString){
 		String outString;
 		List<string> splitString;
