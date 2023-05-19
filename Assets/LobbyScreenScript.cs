@@ -57,8 +57,8 @@ public class LobbyScreenScript : MonoBehaviour
     }
 
     public void SendChatMessage(){
-        if(ChatInputField.Text.Length !=0){
-            FindObjectOfType<SecondServerSocketScript>().sendChat(ChatInputField.Text);
+        if(ChatInputField.text.Length !=0){
+            FindObjectOfType<SecondServerSocketScript>().sendChat(ChatInputField.text);
         }
     }
 
