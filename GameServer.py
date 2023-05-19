@@ -22,7 +22,7 @@ def on_new_client(clientsocket,addr,num):
                 #print(addr, ' >> ', m2 , ' >> ', len(m2))
                 if len(m2) != 0:
                     positions[num] = m2
-                msg = str(positions)
+                msg = "pos$"+str(positions)
                 clientsocket.send(msg.encode('utf-8'))
                     
         except:

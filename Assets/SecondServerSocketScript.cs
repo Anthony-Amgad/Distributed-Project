@@ -87,25 +87,20 @@ public class SecondServerSocketScript : MonoBehaviour {
 	//Listening thread for any other players
 	void Listen(){
 		while(true){
-			if(raceStarted){
-				byte[] bytesToRead = new byte[socketConnection.ReceiveBufferSize];
-				int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
-				Positions = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
-			}else{
-				byte[] bytesToRead = new byte[socketConnection.ReceiveBufferSize];
-				int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
-				Debug.Log(Encoding.ASCII.GetString(bytesToRead, 0, bytesRead));
-				String[] msg = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead).Split("$"[0]);
-				if(msg[0] == "join"){				
+			byte[] bytesToRead = new byte[socketConnection.ReceiveBufferSize];
+			int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
+			String[] msg = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead).Split("$"[0]);
+
+			if(msg[0] == "pos" && raceStarted){
+				Positions = msg[1];
+			}
+			else if(msg[0] == "join"){				
 					nts = msg[1];
 					uN = true;
-				}else if(msg[0] == "start"){
+			}else if(msg[0] == "start"){
 					sR = true;
-				}
 			}
-			
-			/*Debug.Log("Received : " + Encoding.ASCII.GetString(bytesToRead, 0, bytesRead));
-			Positions = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);*/
+
 		}	
 	}
 	
@@ -122,9 +117,9 @@ public class SecondServerSocketScript : MonoBehaviour {
 				Debug.Log(e.Message);
 			}
 			String[] tempos = StringsArrayFromString(Positions);
-			Debug.Log(Positions);
-			Debug.Log(tempos.Length);
-			Debug.Log(tempos[0]+"||"+tempos[1]+"||"+tempos[2]+"||"+tempos[3]+"||"+tempos[4]+"||"+tempos[5]+"||"+tempos[6]+"||"+tempos[7]);
+			//Debug.Log(Positions);
+			//Debug.Log(tempos.Length);
+			//Debug.Log(tempos[0]+"||"+tempos[1]+"||"+tempos[2]+"||"+tempos[3]+"||"+tempos[4]+"||"+tempos[5]+"||"+tempos[6]+"||"+tempos[7]);
 			for(int i = 0; i < tempos.Length; i+=2){
 				if((i/2) != playernum){
 					Players[(i/2)].position = Vector3FromString(tempos[i]);
