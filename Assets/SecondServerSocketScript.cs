@@ -22,8 +22,12 @@ public class SecondServerSocketScript : MonoBehaviour {
 
 	public bool raceStarted = false;
 	private bool uN = false;
-	private String nts;
 	private bool sR = false;
+	private bool cR = false;
+	private String nts;
+	private String chatSender;
+	private String chatMessage;
+
 
 	private NetworkStream nwStream;
 
@@ -100,6 +104,11 @@ public class SecondServerSocketScript : MonoBehaviour {
 			}else if(msg[0] == "start"){
 					sR = true;
 			}
+			else if(msg[0]=="chat"){
+					cR = true;
+					chatSender = msg[1];
+					chatMessage = msg[2];
+			}
 
 		}	
 	}
@@ -133,7 +142,17 @@ public class SecondServerSocketScript : MonoBehaviour {
 		if(sR){
 			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
 			sR = false;
+		}
+		if(cR){
+			Debug.Log(chatSender+chatMessage);
+			// FindObjectOfType<>.
+			cR = false;
 		}	
+	}
+
+	public void sendChat(String s){
+		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("chat$"+s);
+		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 	}
 
 	public void onSecondSceeneLoad(Transform[] playertranss){

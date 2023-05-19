@@ -22,7 +22,7 @@ public class FirstServerSocketScript : MonoBehaviour
     public GameObject LobbyCanvas;
 
     const int PORT_NO = 50001;
-    const string SERVER_IP = "192.168.56.1";
+    const string SERVER_IP = "192.168.1.32";
     void Awake(){
         if(instance != null){
             Destroy(gameObject);

@@ -6,8 +6,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+
 public class LobbyScreenScript : MonoBehaviour
 {
+
+    public InputField ChatInputField; 
 
     GameObject[] PlayerNameTags;
     List<String> Names;
@@ -53,6 +56,12 @@ public class LobbyScreenScript : MonoBehaviour
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
+    public void SendChatMessage(){
+        if(ChatInputField.Text.Length !=0){
+            FindObjectOfType<SecondServerSocketScript>().sendChat(ChatInputField.Text);
+        }
+    }
+
     List<String> StringsListFromString(String MainString){
 		String outString;
 		List<string> splitString;
@@ -63,4 +72,5 @@ public class LobbyScreenScript : MonoBehaviour
         }
 		return splitString;
 	}
+
 }
