@@ -54,6 +54,7 @@ public class PlayerMovement : MonoBehaviour
           }else{
                road2.localPosition = new Vector3(road2.localPosition.x, road2.localPosition.y, road2.localPosition.z + 2000);
           }
+          FindObjectOfType<GameManagerScript>().updateblockers(rflag,diststore);
           diststore+=1000;
           rflag = !rflag;
      }
