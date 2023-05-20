@@ -27,6 +27,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 	private String nts;
 	private String chatSender;
 	private String chatMessage;
+	private int seed;
 
 
 	private NetworkStream nwStream;
@@ -99,15 +100,16 @@ public class SecondServerSocketScript : MonoBehaviour {
 				Positions = msg[1];
 			}
 			else if(msg[0] == "join"){				
-					nts = msg[1];
-					uN = true;
+				nts = msg[1];
+				uN = true;
 			}else if(msg[0] == "start"){
-					sR = true;
+				seed = int.Parse(msg[1]);
+				sR = true;
 			}
 			else if(msg[0]=="chat"){
-					cR = true;
-					chatSender = msg[1];
-					chatMessage = msg[2];
+				cR = true;
+				chatSender = msg[1];
+				chatMessage = msg[2];
 			}
 
 		}	
@@ -126,6 +128,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 				Debug.Log(e.Message);
 			}
 			String[] tempos = StringsArrayFromString(Positions);
+			FindObjectOfType<GameManagerScript>().updategpoints(tempos, playernum);
 			//Debug.Log(Positions);
 			//Debug.Log(tempos.Length);
 			//Debug.Log(tempos[0]+"||"+tempos[1]+"||"+tempos[2]+"||"+tempos[3]+"||"+tempos[4]+"||"+tempos[5]+"||"+tempos[6]+"||"+tempos[7]);
@@ -140,6 +143,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 			uN = false;
 		}
 		if(sR){
+			PlayerPrefs.SetInt("seed",seed);
 			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
 			sR = false;
 		}

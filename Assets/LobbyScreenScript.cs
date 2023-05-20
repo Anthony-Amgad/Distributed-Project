@@ -36,14 +36,14 @@ public class LobbyScreenScript : MonoBehaviour
 
     public void UpdateNames(String s){
         if(s != "admin"){
-            Names.Add(" "+s);
+            Names.Add(s);
+            PlayerPrefs.SetString("Players","["+string.Join(", ", Names.ToArray())+"]");
         }else{
             Names = StringsListFromString(PlayerPrefs.GetString("Players"));
-            Names[0] = " "+ Names[0];
         }
         PlayerNameTags = GameObject.FindGameObjectsWithTag("PlayerNameTag");
         for(int i = 0; i < Names.Count(); i++){
-            PlayerNameTags[i].GetComponentInChildren<Text>().text =  (i+1).ToString() + " " + Names[i];
+            PlayerNameTags[i].GetComponentInChildren<Text>().text =  (i+1).ToString() + "  " + Names[i];
         }
         for(int i = Names.Count(); i < 4; i++){
             PlayerNameTags[i].GetComponentInChildren<Text>().text = (i+1).ToString();
@@ -77,7 +77,8 @@ public class LobbyScreenScript : MonoBehaviour
 		outString = MainString.Substring(1, MainString.Length -2);
 		splitString = outString.Split(","[0]).ToList();
         for( int i = 0; i < splitString.Count(); i++){
-            splitString[i] = splitString[i].Substring(1, splitString[i].Length -2);
+            splitString[i] = splitString[i].Replace(" ","");
+            splitString[i] = splitString[i].Replace("'","");
         }
 		return splitString;
 	}

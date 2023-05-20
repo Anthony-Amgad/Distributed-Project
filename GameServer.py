@@ -1,3 +1,4 @@
+import random
 import socket
 import _thread
 
@@ -17,8 +18,9 @@ def on_new_client(clientsocket,name,num):
             # print(msg)
             m1,m2 = msg.split('$')
             if m1 == "start":
+                seed = random.randint(0,10000)
                 for p in playerSockets:
-                    p.send(("start$").encode('utf-8'))
+                    p.send(("start$"+str(seed)).encode('utf-8'))
             elif m1 == "pos":
                 #print(addr, ' >> ', m2 , ' >> ', len(m2))
                 if len(m2) != 0:
