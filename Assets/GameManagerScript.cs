@@ -15,8 +15,16 @@ public class GameManagerScript : MonoBehaviour
     public Text rightkey;
     public Text leftkey;
 
+    public Text chatText;
+
+    public InputField ChatInputField;
+
+    public bool chatopen = false;
+
     public Transform[] road1blockers;
     public Transform[] road2blockers;
+    public Animator ChatPanelAnimator;
+
 
     void Awake()
     {
@@ -54,6 +62,21 @@ public class GameManagerScript : MonoBehaviour
             }
             //road2.localPosition = new Vector3(road2.localPosition.x, road2.localPosition.y, road2.localPosition.z + 2000);
           }
+    }
+
+    public void chatView(string chatSender, string chatMessage){
+        chatText.text = chatText.text + "\n" + chatSender + ": " + chatMessage;
+    }
+
+    public void chatPanelBtn(){
+        chatopen = !chatopen;
+        ChatPanelAnimator.SetBool("isOpen",chatopen);        
+    }
+
+    public void SendChatMessage(){
+        if(ChatInputField.text.Length !=0){
+            FindObjectOfType<SecondServerSocketScript>().sendChat(ChatInputField.text);
+        }
     }
 
     public void updateKeyGUI(string[] keys){
