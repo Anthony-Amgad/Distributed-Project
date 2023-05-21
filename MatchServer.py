@@ -21,6 +21,12 @@ def on_new_server(serversocket, Sname):
             if msgs[0] == "name":
                 PlayingGameServers[Sname].append(msgs[1])
                 serversocket.send("ok".encode('utf-8'))
+                print(msg[1])
+            if msg[0] == "end":
+                PlayingGameServers.pop(Sname)
+                ReadyGameServers.update({Sname : []})
+                print(PlayingGameServers)
+                print(ReadyGameServers)
         except:
             connected = False
     print("connectionLost")

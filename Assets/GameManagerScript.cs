@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManagerScript : MonoBehaviour
@@ -115,6 +116,10 @@ public class GameManagerScript : MonoBehaviour
         if(!chatopen){
             chatPanelBtn();
         }
+    }
+
+    public void EndGame(){
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
     Vector3 Vector3FromString(String Vector3string) {

@@ -4,12 +4,19 @@ import _thread
 
 names = []
 positions = ['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)']
-count = 0
 state = ["NA","NA","NA","NA"]
+rank = [0,0,0,0]
 playerSockets = []
-
+gameEnded = False
 
 def on_new_client(clientsocket,name,num):
+    global gameEnded
+    global names
+    global positions
+    global state
+    global rank
+    global playerSockets
+    global s
     connected = True
     state[num] = "waiting"
     while connected :
@@ -33,13 +40,25 @@ def on_new_client(clientsocket,name,num):
                     p.send(("chat$"+name+"$"+m2).encode('utf-8'))
             elif m1 == "finish":
                 state[num] = "finished"
+                rank[num] = state.count("finished")
                 clientsocket.send(("rank$"+str(state.count("finished"))).encode('utf-8'))
+                if state.count("started") == 0:
+                    gameEnded = True
+                    for p in playerSockets:
+                        p.send(("end$"+str(rank[0])+str(rank[1])+str(rank[2])+str(rank[3])).encode('utf-8'))
         except Exception as e:
-            print (e)
+            print(name + " disconnected" + " : " + str(e))
+            state[num] = "disconnected"
+            if (state.count("disconnected") + state.count("NA")) == 4:
+                names = []
+                positions = ['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)']
+                state = ["NA","NA","NA","NA"]
+                rank = [0,0,0,0]
+                playerSockets = []
+                gameEnded = False
+                s.send(("end$").encode('utf-8'))
             connected = False
-            print("dis"+str(num))
     clientsocket.close()
-
 
 
 host = socket.gethostname()

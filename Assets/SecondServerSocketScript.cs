@@ -25,9 +25,11 @@ public class SecondServerSocketScript : MonoBehaviour {
 	private bool sR = false;
 	private bool cR = false;
 	private bool fR = false;
-	private String nts;
-	private String chatSender;
-	private String chatMessage;
+	private bool gE = false;
+	private string nts;
+	private string chatSender;
+	private string chatMessage;
+	private string rankings;
 	private int seed;
 	private int rank = 0;
 
@@ -109,12 +111,15 @@ public class SecondServerSocketScript : MonoBehaviour {
 				sR = true;
 			}
 			else if(msg[0]=="chat"){
-				cR = true;
 				chatSender = msg[1];
 				chatMessage = msg[2];
+				cR = true;
 			}else if(msg[0]=="rank"){
-				fR = true;
 				rank = int.Parse(msg[1]);
+				fR = true;
+			}else if(msg[0]=="end"){
+				rankings = msg[1];
+				gE = true;
 			}
 
 		}	
@@ -164,7 +169,13 @@ public class SecondServerSocketScript : MonoBehaviour {
 		if(fR){
 			FindObjectOfType<GameManagerScript>().recievedRank(rank);
 			fR = false;
-		}	
+		}if(gE){
+			raceStarted = false;
+			PlayerPrefs.SetString("ranking",rankings);
+			FindObjectOfType<GameManagerScript>().EndGame();
+			gE = false;
+			//Destroy(gameObject);
+		}
 	}
 
 	public void sendChat(String s){
