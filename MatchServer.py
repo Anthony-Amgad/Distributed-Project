@@ -21,8 +21,10 @@ def on_new_server(serversocket, Sname):
             if msgs[0] == "name":
                 PlayingGameServers[Sname].append(msgs[1])
                 serversocket.send("ok".encode('utf-8'))
-                print(msg[1])
-            if msg[0] == "end":
+                print(msgs[1])
+            if msgs[0] == "end":
+                for n in PlayingGameServers[Sname]:
+                    NamesConnected.pop(n)
                 PlayingGameServers.pop(Sname)
                 ReadyGameServers.update({Sname : []})
                 print(PlayingGameServers)
