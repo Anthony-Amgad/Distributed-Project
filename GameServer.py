@@ -4,10 +4,11 @@ import _thread
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import time
+import uuid
 
 names = []
 game_started = False
-
+seed = 0
 positions = ['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)']
 state = ["NA","NA","NA","NA"]
 rank = [0,0,0,0]
@@ -16,29 +17,34 @@ gameEnded = False
 
 def db_service():
     global game_started
-    db_ip = "ec2-54-162-162-190.compute-1.amazonaws.com"
-    port = 28041
-    # Create a new client and connect to the primary server
-    mongoClient = MongoClient(db_ip, port)
-    db = mongoClient.get_database('racingGameDB')
-    posRecords = db.Positions
-    lobbyRecords = db.Sessions
-    lobby_startTime = str(time.time())
-    lobbyRecords.insert_one({"lobby_start_time": lobby_startTime})
-    print(lobby_startTime)
-    currentTime = time.time()
-    while True:
-        while (game_started):
-            posRecords.insert_one({"lobby_start_time": lobby_startTime,
+    global s
+    global names
+    global positions
+    while True: 
+        db_ip = "ec2-54-162-162-190.compute-1.amazonaws.com"
+        port = 28041
+        # Create a new client and connect to the primary server
+        mongoClient = MongoClient(db_ip, port)
+        db = mongoClient.get_database('racingGameDB')
+        posRecords = db.Positions
+        lobbyRecords = db.Sessions
+        while(not game_started):
+            pass
+        lobby_id = str(uuid.uuid4())
+        lobbyRecords.insert_one({"lobby_id": lobby_id})
+        s.send(("dblobbyid$"+lobby_id).encode('utf-8'))
+        #currentTime = time.time()       
+        while(game_started):
+            posRecords.insert_one({"lobby_start_time": lobby_id,
                                 "lobby_players":names, 
                                 "timestamp": time.time(), 
                                 "positions": positions})
-            print(str(time.time()-currentTime))
-            currentTime = time.time()
-            #time.sleep(0.01)
+            #print(str(time.time()-currentTime))
+            #currentTime = time.time()
+                #time.sleep(0.01)
 
 
-def on_new_client(clientsocket,name,num):
+def on_new_client(clientsocket,name,num,alr):
     global game_started
     global gameEnded
     global names
@@ -47,7 +53,10 @@ def on_new_client(clientsocket,name,num):
     global rank
     global playerSockets
     global s
+    global seed
     connected = True
+    if alr:
+        clientsocket.send(("start$"+str(seed)).encode('utf-8'))
     while connected :
         try:
             msg = clientsocket.recv(1024).decode('utf-8')
@@ -120,7 +129,8 @@ while True:
     UserS.listen(4)               # Now wait for client connection.
     print('Server started!')
     print('Waiting for clients...')
-    #_thread.start_new_thread(db_service,())
+
+    #_thread.start_new_thread(db_service,()) #DATABASE START
 
     while True:
         c, addr = UserS.accept()    # Establish connection with client.
@@ -129,18 +139,21 @@ while True:
         s.send(("name$" + str(name)).encode('utf-8'))
         s.recv(1024).decode('utf-8')
         names_cnt = 0
+        alrd = False
         if name in names:
             names_cnt = names.index(name)
             state[names_cnt] = 'started'
+            c.send((str(names_cnt) + "$" + str(names)).encode('utf-8'))
+            alrd = True
         else:
-            names_cnt = len(names) - 1
             names.append(name)
+            names_cnt = len(names) - 1
             c.send((str(names_cnt) + "$" + str(names)).encode('utf-8'))
             for p in playerSockets:
                 p.send(("join$" + name).encode('utf-8'))
             state[names_cnt] = "waiting"
         playerSockets.append(c)
         _thread.start_new_thread(
-            on_new_client, (c, name, names_cnt))
+            on_new_client, (c, name, names_cnt, alrd))
 
     s.close()

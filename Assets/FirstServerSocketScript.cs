@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
@@ -22,7 +23,7 @@ public class FirstServerSocketScript : MonoBehaviour
     public GameObject LobbyCanvas;
 
     const int PORT_NO = 50001;
-    const string SERVER_IP = "192.168.126.1";
+    const string SERVER_IP = "192.168.56.1";
     void Awake(){
         if(instance != null){
             Destroy(gameObject);
@@ -69,12 +70,9 @@ public class FirstServerSocketScript : MonoBehaviour
             PlayerPrefs.SetString("Lobbys", splitstring[1]);
             MatchMakingCanvas.SetActive(true);
         }
-        else if(splitstring[0] == 'ingame'){
+        else if(splitstring[0] == "ingame"){
             PlayerPrefs.SetString("Server",splitstring[1]);
             SSS.SetActive(true);
-            MatchMakingCanvas.SetActive(false);
-            LobbyCanvas.SetActive(true);
-            FindObjectOfType<LobbyScreenScript>().UpdateNames("admin");
         }
         else if(Encoding.ASCII.GetString(bytesToRead, 0, bytesRead) == "AU"){
             ErrorText.GetComponent<Text>().text = "Name Already in Use";

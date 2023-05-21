@@ -8,7 +8,8 @@ PlayingGameServers = {"0":['0','0','0','0']}
 s = socket.socket()
 host = socket.gethostname()
 port=50001
-OfflineGameServers = {"0", '192.168.126.1#50000'}
+OfflineGameServers = {"0", '192.168.56.1#50000'}
+GameServersLobbyIDS = {"0":"0", '192.168.56.1#50000':0}
 #ygf ip 192.168.1.32
 #antoon ip 192.168.56.1
 #kero ip 192.168.126.1
@@ -26,12 +27,14 @@ def on_new_server(serversocket, Sname):
                     NamesConnected[msgs[1]] = 'inlobby'
                 serversocket.send("ok".encode('utf-8'))
                 print(msgs[1])
-            elif msgs[0] == "end":
-                for n in PlayingGameServers[Sname]:
-                    NamesConnected.pop(n)
+            elif msgs[0] == "end": 
                 if Sname in PlayingGameServers:
+                    for n in PlayingGameServers[Sname]:
+                        NamesConnected.pop(n)
                     PlayingGameServers.pop(Sname)
                 if Sname in InGameServers:
+                    for n in InGameServers[Sname]:
+                        NamesConnected.pop(n)
                     InGameServers.pop(Sname)
                 ReadyGameServers.update({Sname : []})
                 print(PlayingGameServers)
@@ -39,12 +42,17 @@ def on_new_server(serversocket, Sname):
             elif msgs[0] == 'startgame':
                 for client in PlayingGameServers[Sname]:
                     NamesConnected[client] = 'ingame'
-                popped = PlayingGameServers.pop(Sname)
-                InGameServers.update(popped)
+                InGameServers.update({Sname: PlayingGameServers[Sname]})
+                PlayingGameServers.pop(Sname)
             elif msgs[0] == 'dc':
-                if Sname in PlayingGameServers and msgs[1] in PlayingGameServers[Sname]:
+                if Sname in InGameServers and msgs[1] in InGameServers[Sname]:
+                    NamesConnected[msgs[1]] = 'disconnected'
+                elif Sname in PlayingGameServers and msgs[1] in PlayingGameServers[Sname]:
                     PlayingGameServers[Sname].remove(msgs[1]) 
-        except:
+            elif msgs[0] == "dblobbyid":
+                print(msgs[1])
+        except Exception as e:
+            print(e)
             if Sname in PlayingGameServers:
                 PlayingGameServers.pop(Sname)
             if Sname in InGameServers:
@@ -111,8 +119,8 @@ while True:
             _thread.start_new_thread(on_new_client,(c,msg))
         elif NamesConnected[msg] == 'disconnected':
             found = 0
-            for key, names in InGameServers:
-                if msg in names:
+            for key in InGameServers.keys():
+                if msg in InGameServers[key]:
                     c.send(('ingame$' + key).encode('utf-8'))
                     found = 1
                     break
