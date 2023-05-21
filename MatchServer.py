@@ -3,13 +3,15 @@ import _thread
 
 NamesConnected = {"admin":"admin"}
 ReadyGameServers = {"0":['0','0','0','0']}
+InGameServers = {"0":['0','0','0','0']}
 PlayingGameServers = {"0":['0','0','0','0']}
 s = socket.socket()
 host = socket.gethostname()
 port=50001
-OfflineGameServers = {"0", '192.168.56.1#50000'}
+OfflineGameServers = {"0", '192.168.126.1#50000'}
 #ygf ip 192.168.1.32
 #antoon ip 192.168.56.1
+#kero ip 192.168.126.1
 
 def on_new_server(serversocket, Sname):
     connected = True
@@ -19,17 +21,37 @@ def on_new_server(serversocket, Sname):
             msg = serversocket.recv(1024).decode('utf-8')
             msgs = msg.split('$')
             if msgs[0] == "name":
-                PlayingGameServers[Sname].append(msgs[1])
+                if Sname in PlayingGameServers:
+                    PlayingGameServers[Sname].append(msgs[1])
+                    NamesConnected[msgs[1]] = 'inlobby'
                 serversocket.send("ok".encode('utf-8'))
                 print(msgs[1])
-            if msgs[0] == "end":
+            elif msgs[0] == "end":
                 for n in PlayingGameServers[Sname]:
                     NamesConnected.pop(n)
-                PlayingGameServers.pop(Sname)
+                if Sname in PlayingGameServers:
+                    PlayingGameServers.pop(Sname)
+                if Sname in InGameServers:
+                    InGameServers.pop(Sname)
                 ReadyGameServers.update({Sname : []})
                 print(PlayingGameServers)
                 print(ReadyGameServers)
+            elif msgs[0] == 'startgame':
+                for client in PlayingGameServers[Sname]:
+                    NamesConnected[client] = 'ingame'
+                popped = PlayingGameServers.pop(Sname)
+                InGameServers.update(popped)
+            elif msgs[0] == 'dc':
+                if Sname in PlayingGameServers and msgs[1] in PlayingGameServers[Sname]:
+                    PlayingGameServers[Sname].remove(msgs[1]) 
         except:
+            if Sname in PlayingGameServers:
+                PlayingGameServers.pop(Sname)
+            if Sname in InGameServers:
+                InGameServers.pop(Sname)
+            if Sname in ReadyGameServers:
+                ReadyGameServers.pop(Sname)
+            OfflineGameServers.add(Sname)
             connected = False
     print("connectionLost")
     serversocket.close()
@@ -52,6 +74,10 @@ def on_new_client(clientsocket, name):
                 if len(PlayingGameServers[msgs[1]]) < 4:
                     clientsocket.send("ok".encode('utf-8'))
         except:
+            if NamesConnected[name] == 'ingame':
+                NamesConnected[name] = 'disconnected'
+            else:
+                NamesConnected.pop(name)
             connected = False
     clientsocket.close()
 
@@ -73,19 +99,25 @@ while True:
         msg = msg.split('$')
         if msg[1] == "wokenup":
             OfflineGameServers.remove(addr[0]+'#'+msg[0])
-        elif msg[1] == "ended":
-            PlayingGameServers.pop(addr[0]+'#'+msg[0])
         ReadyGameServers.update({(addr[0]+'#'+msg[0]) : []})
         c.send("ready".encode('utf-8'))
         _thread.start_new_thread(on_new_server,(c,(addr[0]+'#'+msg[0])))
     elif msg == "user":
         c.send("ok".encode('utf-8'))
         msg = c.recv(1024).decode('utf-8').lower()
-        Names = set(NamesConnected.keys())
-        if len(Names.intersection({msg})) == 0:
+        if msg not in NamesConnected:
             NamesConnected.update({msg : "searching"})
             c.send(("ready$" + str(PlayingGameServers)).encode('utf-8'))
             _thread.start_new_thread(on_new_client,(c,msg))
+        elif NamesConnected[msg] == 'disconnected':
+            found = 0
+            for key, names in InGameServers:
+                if msg in names:
+                    c.send(('ingame$' + key).encode('utf-8'))
+                    found = 1
+                    break
+            if found == 1:
+                NamesConnected[msg] = 'ingame'
         else:
             c.send("AU".encode('utf-8'))
             c.close

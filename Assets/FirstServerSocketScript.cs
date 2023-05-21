@@ -22,7 +22,7 @@ public class FirstServerSocketScript : MonoBehaviour
     public GameObject LobbyCanvas;
 
     const int PORT_NO = 50001;
-    const string SERVER_IP = "192.168.56.1";
+    const string SERVER_IP = "192.168.126.1";
     void Awake(){
         if(instance != null){
             Destroy(gameObject);
@@ -63,12 +63,20 @@ public class FirstServerSocketScript : MonoBehaviour
         String[] splitstring = {};
         splitstring = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead).Split("$"[0]);
 		//Debug.Log(Encoding.ASCII.GetString(bytesToRead, 0, bytesRead));
-		if( splitstring[0] == "ready"){
+		if(splitstring[0] == "ready"){
             ErrorText.SetActive(false);
             PlayerPrefs.SetString("MainName",NameInputField.text);
             PlayerPrefs.SetString("Lobbys", splitstring[1]);
             MatchMakingCanvas.SetActive(true);
-        }else if(Encoding.ASCII.GetString(bytesToRead, 0, bytesRead) == "AU"){
+        }
+        else if(splitstring[0] == 'ingame'){
+            PlayerPrefs.SetString("Server",splitstring[1]);
+            SSS.SetActive(true);
+            MatchMakingCanvas.SetActive(false);
+            LobbyCanvas.SetActive(true);
+            FindObjectOfType<LobbyScreenScript>().UpdateNames("admin");
+        }
+        else if(Encoding.ASCII.GetString(bytesToRead, 0, bytesRead) == "AU"){
             ErrorText.GetComponent<Text>().text = "Name Already in Use";
             ErrorText.SetActive(true);
             socketConnection.Close();

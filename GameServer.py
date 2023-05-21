@@ -48,7 +48,6 @@ def on_new_client(clientsocket,name,num):
     global playerSockets
     global s
     connected = True
-    state[num] = "waiting"
     while connected :
         try:
             msg = clientsocket.recv(1024).decode('utf-8')
@@ -59,6 +58,7 @@ def on_new_client(clientsocket,name,num):
                 for i, p in enumerate(playerSockets):
                     p.send(("start$"+str(seed)).encode('utf-8'))
                     state[i] = "started"
+                s.send(("startgame$").encode('utf-8'))
                 game_started = True
             elif m1 == "pos":
                 #print(addr, ' >> ', m2 , ' >> ', len(m2))
@@ -81,6 +81,7 @@ def on_new_client(clientsocket,name,num):
         except Exception as e:
             print(name + " disconnected" + " : " + str(e))
             state[num] = "disconnected"
+            s.send(('dc$' + name).encode('utf-8'))
             if (state.count("disconnected") + state.count("NA")) == 4:
                 print("hehehe")
                 game_started = False
@@ -125,17 +126,21 @@ while True:
         c, addr = UserS.accept()    # Establish connection with client.
         print('Got connection from', addr)
         name = c.recv(1024).decode('utf-8')
-        names.append(name)
-        #print(name)
         s.send(("name$" + str(name)).encode('utf-8'))
         s.recv(1024).decode('utf-8')
-        c.send((str(len(playerSockets)) + "$" + str(names)).encode('utf-8'))
-        print(len(playerSockets))
-        for p in playerSockets:
-            p.send(("join$" + name).encode('utf-8'))
+        names_cnt = 0
+        if name in names:
+            names_cnt = names.index(name)
+            state[names_cnt] = 'started'
+        else:
+            names_cnt = len(names) - 1
+            names.append(name)
+            c.send((str(names_cnt) + "$" + str(names)).encode('utf-8'))
+            for p in playerSockets:
+                p.send(("join$" + name).encode('utf-8'))
+            state[names_cnt] = "waiting"
         playerSockets.append(c)
-        print(len(playerSockets) - 1)
         _thread.start_new_thread(
-            on_new_client, (c, name, len(playerSockets) - 1))
+            on_new_client, (c, name, names_cnt))
 
     s.close()
