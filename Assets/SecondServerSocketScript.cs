@@ -24,10 +24,12 @@ public class SecondServerSocketScript : MonoBehaviour {
 	private bool uN = false;
 	private bool sR = false;
 	private bool cR = false;
+	private bool fR = false;
 	private String nts;
 	private String chatSender;
 	private String chatMessage;
 	private int seed;
+	private int rank = 0;
 
 
 	private NetworkStream nwStream;
@@ -110,6 +112,9 @@ public class SecondServerSocketScript : MonoBehaviour {
 				cR = true;
 				chatSender = msg[1];
 				chatMessage = msg[2];
+			}else if(msg[0]=="rank"){
+				fR = true;
+				rank = int.Parse(msg[1]);
 			}
 
 		}	
@@ -154,8 +159,11 @@ public class SecondServerSocketScript : MonoBehaviour {
 			}else{
 				FindObjectOfType<LobbyScreenScript>().chatView(chatSender,chatMessage);
 			}
-			// FindObjectOfType<>.
 			cR = false;
+		}
+		if(fR){
+			FindObjectOfType<GameManagerScript>().recievedRank(rank);
+			fR = false;
 		}	
 	}
 
@@ -181,6 +189,10 @@ public class SecondServerSocketScript : MonoBehaviour {
 		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 	}
 	
+	public void sendFinishSignal(){
+		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("finish$");
+		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
+	}
 	private void OnApplicationQuit() {
 		try
 		{

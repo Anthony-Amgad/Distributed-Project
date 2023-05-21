@@ -5,13 +5,13 @@ import _thread
 names = []
 positions = ['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)']
 count = 0
-state = []
+state = ["NA","NA","NA","NA"]
 playerSockets = []
 
 
 def on_new_client(clientsocket,name,num):
     connected = True
-    state.append("waiting")
+    state[num] = "waiting"
     while connected :
         try:
             msg = clientsocket.recv(1024).decode('utf-8')
@@ -19,8 +19,9 @@ def on_new_client(clientsocket,name,num):
             m1,m2 = msg.split('$')
             if m1 == "start":
                 seed = random.randint(0,10000)
-                for p in playerSockets:
+                for i, p in enumerate(playerSockets):
                     p.send(("start$"+str(seed)).encode('utf-8'))
+                    state[i] = "started"
             elif m1 == "pos":
                 #print(addr, ' >> ', m2 , ' >> ', len(m2))
                 if len(m2) != 0:
@@ -30,6 +31,9 @@ def on_new_client(clientsocket,name,num):
             elif m1 == "chat":
                 for p in playerSockets:
                     p.send(("chat$"+name+"$"+m2).encode('utf-8'))
+            elif m1 == "finish":
+                state[num] = "finished"
+                clientsocket.send(("rank$"+str(state.count("finished"))).encode('utf-8'))
         except Exception as e:
             print (e)
             connected = False

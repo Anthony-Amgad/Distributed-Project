@@ -30,6 +30,9 @@ public class GameManagerScript : MonoBehaviour
     public Transform[] road2blockers;
     public Animator ChatPanelAnimator;
     public TextMesh[] playertags;
+    public GameObject finishPanel;
+    public GameObject keysPanel;
+    public Text rankText;
 
 
     void Awake()
@@ -90,6 +93,7 @@ public class GameManagerScript : MonoBehaviour
     public void SendChatMessage(){
         if(ChatInputField.text.Length !=0){
             FindObjectOfType<SecondServerSocketScript>().sendChat(ChatInputField.text);
+            ChatInputField.text = "";
         }
     }
 
@@ -98,6 +102,19 @@ public class GameManagerScript : MonoBehaviour
         rightkey.text = keys[1];
         leftkey.text = keys[2];
         downkey.text = keys[3];
+    }
+
+    public void playerFinished(){
+        FindObjectOfType<SecondServerSocketScript>().sendFinishSignal();
+    }
+
+    public void recievedRank(int rank){
+        rankText.text = rank.ToString();
+        keysPanel.SetActive(false);
+        finishPanel.SetActive(true);
+        if(!chatopen){
+            chatPanelBtn();
+        }
     }
 
     Vector3 Vector3FromString(String Vector3string) {

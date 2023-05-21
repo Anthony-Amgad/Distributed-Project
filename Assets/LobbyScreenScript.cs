@@ -52,14 +52,13 @@ public class LobbyScreenScript : MonoBehaviour
     }
 
     public void StartGame(){
-        //FindObjectOfType<SecondServerSocketScript>().PlayersNames = Names;
         FindObjectOfType<SecondServerSocketScript>().sendStartSignal();
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
     public void SendChatMessage(){
         if(ChatInputField.text.Length !=0){
             FindObjectOfType<SecondServerSocketScript>().sendChat(ChatInputField.text);
+            ChatInputField.text = "";
         }
     }
 
