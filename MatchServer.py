@@ -7,7 +7,7 @@ PlayingGameServers = {"0":['0','0','0','0']}
 s = socket.socket()
 host = socket.gethostname()
 port=50001
-OfflineGameServers = {"0", '127.0.0.1#50000'}
+OfflineGameServers = {"0", '192.168.56.1#50000'}
 #ygf ip 192.168.1.32
 #antoon ip 192.168.56.1
 
@@ -21,6 +21,12 @@ def on_new_server(serversocket, Sname):
             if msgs[0] == "name":
                 PlayingGameServers[Sname].append(msgs[1])
                 serversocket.send("ok".encode('utf-8'))
+                print(msg[1])
+            if msg[0] == "end":
+                PlayingGameServers.pop(Sname)
+                ReadyGameServers.update({Sname : []})
+                print(PlayingGameServers)
+                print(ReadyGameServers)
         except:
             connected = False
     print("connectionLost")

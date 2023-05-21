@@ -24,9 +24,14 @@ public class SecondServerSocketScript : MonoBehaviour {
 	private bool uN = false;
 	private bool sR = false;
 	private bool cR = false;
-	private String nts;
-	private String chatSender;
-	private String chatMessage;
+	private bool fR = false;
+	private bool gE = false;
+	private string nts;
+	private string chatSender;
+	private string chatMessage;
+	private string rankings;
+	private int seed;
+	private int rank = 0;
 
 
 	private NetworkStream nwStream;
@@ -99,15 +104,22 @@ public class SecondServerSocketScript : MonoBehaviour {
 				Positions = msg[1];
 			}
 			else if(msg[0] == "join"){				
-					nts = msg[1];
-					uN = true;
+				nts = msg[1];
+				uN = true;
 			}else if(msg[0] == "start"){
-					sR = true;
+				seed = int.Parse(msg[1]);
+				sR = true;
 			}
 			else if(msg[0]=="chat"){
-					cR = true;
-					chatSender = msg[1];
-					chatMessage = msg[2];
+				chatSender = msg[1];
+				chatMessage = msg[2];
+				cR = true;
+			}else if(msg[0]=="rank"){
+				rank = int.Parse(msg[1]);
+				fR = true;
+			}else if(msg[0]=="end"){
+				rankings = msg[1];
+				gE = true;
 			}
 
 		}	
@@ -126,6 +138,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 				Debug.Log(e.Message);
 			}
 			String[] tempos = StringsArrayFromString(Positions);
+			FindObjectOfType<GameManagerScript>().updategpoints(tempos, playernum);
 			//Debug.Log(Positions);
 			//Debug.Log(tempos.Length);
 			//Debug.Log(tempos[0]+"||"+tempos[1]+"||"+tempos[2]+"||"+tempos[3]+"||"+tempos[4]+"||"+tempos[5]+"||"+tempos[6]+"||"+tempos[7]);
@@ -140,17 +153,29 @@ public class SecondServerSocketScript : MonoBehaviour {
 			uN = false;
 		}
 		if(sR){
+			PlayerPrefs.SetInt("seed",seed);
 			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
 			sR = false;
 		}
 		if(cR){
 			Debug.Log(chatSender+chatMessage);
-			if(!raceStarted){
+			if(raceStarted){
+				FindObjectOfType<GameManagerScript>().chatView(chatSender,chatMessage);
+			}else{
 				FindObjectOfType<LobbyScreenScript>().chatView(chatSender,chatMessage);
 			}
-			// FindObjectOfType<>.
 			cR = false;
-		}	
+		}
+		if(fR){
+			FindObjectOfType<GameManagerScript>().recievedRank(rank);
+			fR = false;
+		}if(gE){
+			raceStarted = false;
+			PlayerPrefs.SetString("ranking",rankings);
+			FindObjectOfType<GameManagerScript>().EndGame();
+			gE = false;
+			//Destroy(gameObject);
+		}
 	}
 
 	public void sendChat(String s){
@@ -175,6 +200,10 @@ public class SecondServerSocketScript : MonoBehaviour {
 		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 	}
 	
+	public void sendFinishSignal(){
+		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("finish$");
+		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
+	}
 	private void OnApplicationQuit() {
 		try
 		{

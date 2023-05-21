@@ -32,21 +32,23 @@ public class PlayerMovement : MonoBehaviour
      }
 
      void FixedUpdate()
-     {       
-     if( Input.GetKey(keys[0]) && rb.velocity.z < 75){
+     {
+     if(!FindObjectOfType<GameManagerScript>().chatopen){
+          if( Input.GetKey(keys[0]) && rb.velocity.z < 75){
           rb.AddForce(0, 0, forwardForce * Time.deltaTime);
-     }
-     if( Input.GetKey(keys[1]) ){
-          rb.AddForce(sidewaysForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
-     }
-     if( Input.GetKey(keys[2]) ){
-          rb.AddForce(-1 * sidewaysForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
-     }
-     if( Input.GetKey(keys[3]) && rb.velocity.z > -25){
-          rb.AddForce(0, 0, -1 * forwardForce * Time.deltaTime);
-     }
-     if( (Input.GetKey(keys[1]) ||  Input.GetKey(keys[2])) && (rb.velocity.z > 0) ){
-          rb.AddForce(0, 0, -1 * 100 * Time.deltaTime);
+          }
+          if( Input.GetKey(keys[1]) ){
+               rb.AddForce(sidewaysForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
+          }
+          if( Input.GetKey(keys[2]) ){
+               rb.AddForce(-1 * sidewaysForce * Time.deltaTime, 0, 0, ForceMode.VelocityChange);
+          }
+          if( Input.GetKey(keys[3]) && rb.velocity.z > -25){
+               rb.AddForce(0, 0, -1 * forwardForce * Time.deltaTime);
+          }
+          if( (Input.GetKey(keys[1]) ||  Input.GetKey(keys[2])) && (rb.velocity.z > 0) ){
+               rb.AddForce(0, 0, -1 * 100 * Time.deltaTime);
+          }
      }
      if(trans.position.z > diststore){
           if(rflag){
@@ -54,6 +56,7 @@ public class PlayerMovement : MonoBehaviour
           }else{
                road2.localPosition = new Vector3(road2.localPosition.x, road2.localPosition.y, road2.localPosition.z + 2000);
           }
+          FindObjectOfType<GameManagerScript>().updateblockers(rflag,diststore);
           diststore+=1000;
           rflag = !rflag;
      }
