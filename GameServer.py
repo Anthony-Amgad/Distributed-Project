@@ -133,9 +133,9 @@ class GameServer:
     def db_service(self):
         while True: 
             db_ip = "ec2-54-162-162-190.compute-1.amazonaws.com"
-            port = 28041
+            db_port = 28041
             # Create a new client and connect to the primary server
-            mongoClient = MongoClient(db_ip, port)
+            mongoClient = MongoClient(db_ip, db_port)
             db = mongoClient.get_database('racingGameDB')
             posRecords = db.Positions
             lobbyRecords = db.Sessions

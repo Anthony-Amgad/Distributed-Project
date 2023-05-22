@@ -1,5 +1,9 @@
 import socket
 import _thread
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
+
 
 NamesConnected = {"admin":"admin"}
 ReadyGameServers = {"0":['0','0','0','0']}
@@ -90,7 +94,12 @@ def on_new_client(clientsocket, name):
             connected = False
     clientsocket.close()
 
-
+db_ip = "ec2-54-162-162-190.compute-1.amazonaws.com"
+db_port = 28041
+# Create a new client and connect to the primary server
+mongoClient = MongoClient(db_ip, db_port)
+db = mongoClient.get_database('racingGameDB')
+posRecords = db.Positions
 
 print('Server started!')
 print('Waiting for clients...')
@@ -122,7 +131,10 @@ while True:
             found = 0
             for key in InGameServers.keys():
                 if msg in InGameServers[key]:
-                    c.send(('ingame$' + key).encode('utf-8'))
+                    positions = posRecords.find({'lobby_id': GameServersLobbyIDS[key]})
+                    positions = positions.sort('timestamp', -1)
+                    print(positions[0]['positions'])
+                    c.send(('ingame$' + key + '$' + str(positions[0]['positions'])).encode('utf-8'))
                     found = 1
                     break
             if found == 1:
