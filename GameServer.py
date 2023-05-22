@@ -44,8 +44,9 @@ class GameServer:
         self.finished = 0   
         while True:
             host = socket.gethostname()
+            matchS = socket.gethostbyname("ec2-54-196-191-35.compute-1.amazonaws.com")
             self.serverSocket = socket.socket()
-            self.serverSocket.connect((host, 50001))
+            self.serverSocket.connect((matchS, 50001))
             self.serverSocket.send("server".encode('utf-8'))
             self.serverSocket.recv(1024).decode('utf-8')
             self.serverSocket.send((str(port)+"$wokenup").encode('utf-8'))
