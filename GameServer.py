@@ -135,7 +135,7 @@ class GameServer:
                         elif m[0] == "finish":
                             self.state[num] = "finished"
                             self.finished += 1
-                            self.rank[num] = self.finished
+                            self.rank[num] = int(self.finished)
                             clientsocket.send(("rank$"+str(self.finished)+"~").encode('utf-8'))
                             if self.state.count("started") == 0:
                                 #print(self.state)
