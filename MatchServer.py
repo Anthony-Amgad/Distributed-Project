@@ -24,6 +24,7 @@ def on_new_server(serversocket, Sname):
     while connected :
         try:
             msg = serversocket.recv(1024).decode('utf-8')
+            if not msg: raise
             msgs = msg.split('$')
             if msgs[0] == "name":
                 if Sname in PlayingGameServers:
@@ -74,6 +75,7 @@ def on_new_client(clientsocket, name):
     while connected :
         try:
             msg = clientsocket.recv(1024).decode('utf-8')
+            if not msg: raise
             msgs = msg.split('$')
             if msgs[0] == "new":
                 if len(ReadyGameServers) > 1:
@@ -98,8 +100,7 @@ db_ip = "ec2-54-162-162-190.compute-1.amazonaws.com"
 db_port = 28041
 # Create a new client and connect to the primary server
 mongoClient = MongoClient(db_ip, db_port)
-db = mongoClient.get_database('racingGameDB')
-posRecords = db.Positions
+posRecords = mongoClient['racingGameDB']['Positions']
 
 print('Server started!')
 print('Waiting for clients...')
@@ -131,9 +132,7 @@ while True:
             found = 0
             for key in InGameServers.keys():
                 if msg in InGameServers[key]:
-                    positions = posRecords.find({'lobby_id': GameServersLobbyIDS[key]})
-                    positions = positions.sort('timestamp', -1)
-                    print(positions[0]['positions'])
+                    positions = posRecords.find({'lobby_id': GameServersLobbyIDS[key]}).sort('timestamp', -1).limit(1)
                     c.send(('ingame$' + key + '$' + str(positions[0]['positions'])).encode('utf-8'))
                     found = 1
                     break

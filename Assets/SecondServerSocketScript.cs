@@ -12,10 +12,9 @@ public class SecondServerSocketScript : MonoBehaviour {
 
     static SecondServerSocketScript instance;
 	public bool ready { get; private set;}
-	private Vector3[] positions = {new Vector3((float)2.2, (float)1.5, 0),
-          new Vector3((float)-2.7, (float)1.5, 0),
-          new Vector3((float)-7.8, (float)1.5, 0),
-          new Vector3((float)7.4, (float)1.5, 0)};
+	private String Startpositions = "['(2.2,1.5,0.0)','(-2.7,1.5,0.0)','(-7.8,1.5,0.0)','(7.4,1.5,0.0)']";
+
+		  //"['(2.2,1.5,0.0)','(-2.7,1.5,0.0)','(-7.8,1.5,0.0)','(7.4,1.5,0.0)']"
 	private TcpClient socketConnection;
 	
 	public List<String> PlayersNames;
@@ -64,6 +63,7 @@ public class SecondServerSocketScript : MonoBehaviour {
         }else{
             instance = this;
             DontDestroyOnLoad(gameObject);
+			Startpositions = PlayerPrefs.GetString("startpos");
 			SERVER_IP = PlayerPrefs.GetString("Server").Split("#"[0])[0];
 			PORT_NO = int.Parse(PlayerPrefs.GetString("Server").Split("#"[0])[1]);
 			try {  			
@@ -103,7 +103,6 @@ public class SecondServerSocketScript : MonoBehaviour {
 			byte[] bytesToRead = new byte[socketConnection.ReceiveBufferSize];
 			int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
 			String[] msg = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead).Split("$"[0]);
-
 			if(msg[0] == "pos" && raceStarted){
 				Positions = msg[1];
 			}
@@ -138,13 +137,15 @@ public class SecondServerSocketScript : MonoBehaviour {
 		if(raceStarted){
 			try{
 				if (Time.fixedTime >= timeToGo) {
-				byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("pos$"+MainPlayerTrans.position.ToString());
+				Debug.Log("pos$"+MainPlayerTrans.position.ToString());
+				byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("pos$"+MainPlayerTrans.position.ToString()+"$");
 				nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 				timeToGo = Time.fixedTime + timeOffset;
 				}
 			}catch(Exception e){
 				Debug.Log(e.Message);
 			}
+			Debug.Log(Positions);
 			String[] tempos = StringsArrayFromString(Positions);
 			FindObjectOfType<GameManagerScript>().updategpoints(tempos, playernum);
 			//Debug.Log(Positions);
@@ -202,7 +203,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 	}
 
 	public void sendChat(String s){
-		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("chat$"+s);
+		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("chat$"+s+"$");
 		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 	}
 
@@ -212,7 +213,8 @@ public class SecondServerSocketScript : MonoBehaviour {
 		MainPlayerObject = GameObject.FindGameObjectWithTag("MainPlayer");
 		MainPlayerTrans = MainPlayerObject.GetComponent<Transform>();
 		playerScript =  FindObjectOfType<PlayerMovement>();
-		MainPlayerTrans.position = positions[PlayerPrefs.GetInt("playerCount")];
+		String[] tempos = StringsArrayFromString(Startpositions);
+		MainPlayerTrans.position = Vector3FromString(tempos[PlayerPrefs.GetInt("playerCount")*2]);//[PlayerPrefs.GetInt("playerCount")];
 		timeToGo = Time.fixedTime;
 		raceStarted = true;
 		//MainPlayerObject.SetActive(true);

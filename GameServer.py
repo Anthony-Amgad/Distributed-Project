@@ -7,6 +7,7 @@ import time
 import uuid
 
 class GameServer:
+    
     names = []
     game_started = False
     seed = 0
@@ -16,9 +17,31 @@ class GameServer:
     playerSockets = []
     gameEnded = False
     serverSocket = None
-    finished = 0
+    finished = 0  
 
-    def newGameServer(self,port):    
+    def __init__(self):
+        self.names = []
+        self.game_started = False
+        self.seed = 0
+        self.positions = ['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)']
+        self.state = ["NA","NA","NA","NA"]
+        self.rank = [0,0,0,0]
+        self.playerSockets = []
+        self.gameEnded = False
+        self.serverSocket = None
+        self.finished = 0   
+    
+    def startGameServer(self,port): 
+        self.names = []
+        self.game_started = False
+        self.seed = 0
+        self.positions = ['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)']
+        self.state = ["NA","NA","NA","NA"]
+        self.rank = [0,0,0,0]
+        self.playerSockets = []
+        self.gameEnded = False
+        self.serverSocket = None
+        self.finished = 0   
         while True:
             host = socket.gethostname()
             self.serverSocket = socket.socket()
@@ -42,7 +65,7 @@ class GameServer:
             print('Server started!')
             print('Waiting for clients...')
 
-            #_thread.start_new_thread(self.db_service,()) #DATABASE START
+            _thread.start_new_thread(self.db_service,()) #DATABASE START
 
             while True:
                 c, addr = UserS.accept()    # Establish connection with client.
@@ -78,25 +101,27 @@ class GameServer:
         while connected :
             try:
                 msg = clientsocket.recv(1024).decode('utf-8')
-                # print(msg)
-                m1, m2 = msg.split('$')
-                if m1 == "start":
+                if not msg: raise
+                msg = msg.rstrip("pos$")
+                m = msg.split('$')
+                if m[0] == "start":
                     self.seed = random.randint(0,10000)
                     for i, p in enumerate(self.playerSockets):
                         p.send(("start$"+str(self.seed)).encode('utf-8'))
                         self.state[i] = "started"
                     self.serverSocket.send(("startgame$").encode('utf-8'))
                     self.game_started = True
-                elif m1 == "pos":
+                elif m[0] == "pos":
+                    print(msg)
                     #print(addr, ' >> ', m2 , ' >> ', len(m2))
-                    if len(m2) != 0:
-                        self.positions[num] = m2
-                    msg = "pos$"+str(self.positions)
-                    clientsocket.send(msg.encode('utf-8'))
-                elif m1 == "chat":
+                    if len(m[1]) != 0:
+                        self.positions[num] = m[1]
+                    nmsg = "pos$"+str(self.positions)
+                    clientsocket.send(nmsg.encode('utf-8'))
+                elif m[0] == "chat":
                     for p in self.playerSockets:
-                        p.send(("chat$"+name+"$"+m2).encode('utf-8'))
-                elif m1 == "finish":
+                        p.send(("chat$"+name+"$"+m[1]).encode('utf-8'))
+                elif m[0] == "finish":
                     self.state[num] = "finished"
                     self.finished += 1
                     self.rank[num] = self.finished
@@ -115,17 +140,22 @@ class GameServer:
                     self.state.pop(num)
                     self.state.append("NA")
                 for i, p in enumerate(self.playerSockets):
-                    p.send(("dc$"+name+"$"+str(i)).encode('utf-8'))
+                    if p != clientsocket:
+                        try:
+                            p.send(("dc$"+name+"$"+str(i)).encode('utf-8'))
+                        except:
+                            print("pass")
                 self.serverSocket.send(('dc$' + name).encode('utf-8'))
                 if (self.state.count("disconnected") + self.state.count("NA")) == 4:
-                    print("hehehe")
                     self.game_started = False
                     self.names = []
+                    print(self.names)
                     self.positions = ['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)']
                     self.state = ["NA","NA","NA","NA"]
                     self.rank = [0,0,0,0]
                     self.playerSockets = []
                     self.gameEnded = False
+                    print("hehehe")
                     self.serverSocket.send(("end$").encode('utf-8'))
                 connected = False
         clientsocket.close()
@@ -146,7 +176,7 @@ class GameServer:
             self.serverSocket.send(("dblobbyid$"+lobby_id).encode('utf-8'))
             #currentTime = time.time()       
             while(self.game_started):
-                posRecords.insert_one({"lobby_start_time": lobby_id,
+                posRecords.insert_one({"lobby_id": lobby_id,
                                     "lobby_players":self.names, 
                                     "timestamp": time.time(), 
                                     "positions": self.positions})
@@ -157,13 +187,13 @@ class GameServer:
 
 
 #MAIN
-
-for i in range(50002, 50008):
-    gameS = GameServer()
-    _thread.start_new_thread(
-                    gameS.newGameServer, tuple([i]))
-    #time.sleep(2)
+if __name__ == "__main__":
+    gS = []
+    for i, j in enumerate(range(50002, 50003)):
+        gS.append(GameServer())
+        _thread.start_new_thread(gS[i].startGameServer, tuple([j]))
     
-while True:
-    pass
+
+    while True:
+        pass
     

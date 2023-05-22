@@ -30,6 +30,7 @@ public class FirstServerSocketScript : MonoBehaviour
         }else{
             instance = this;
             DontDestroyOnLoad(gameObject);
+            PlayerPrefs.SetString("startpos","['(2.2,1.5,0.0)','(-2.7,1.5,0.0)','(-7.8,1.5,0.0)','(7.4,1.5,0.0)']");
         }
     }
 
@@ -72,6 +73,7 @@ public class FirstServerSocketScript : MonoBehaviour
         }
         else if(splitstring[0] == "ingame"){
             PlayerPrefs.SetString("Server",splitstring[1]);
+            PlayerPrefs.SetString("startpos",splitstring[2]);
             SSS.SetActive(true);
         }
         else if(Encoding.ASCII.GetString(bytesToRead, 0, bytesRead) == "AU"){
