@@ -49,7 +49,7 @@ class GameServer:
             self.serverSocket.connect((matchS, 50001))
             self.serverSocket.send("server".encode('utf-8'))
             self.serverSocket.recv(1024).decode('utf-8')
-            self.serverSocket.send((str(port)+"$http://ec2-54-158-41-118.compute-1.amazonaws.com/").encode('utf-8'))
+            self.serverSocket.send((str(port)+"$ec2-54-158-41-118.compute-1.amazonaws.com").encode('utf-8'))
             msg = self.serverSocket.recv(1024).decode('utf-8')
             online = False
             running = False
@@ -87,7 +87,10 @@ class GameServer:
                     names_cnt = len(self.names) - 1
                     c.send((str(names_cnt) + "$" + str(self.names)).encode('utf-8'))
                     for p in self.playerSockets:
-                        p.send(("join$" + name).encode('utf-8'))
+                        try:
+                            p.send(("join$" + name).encode('utf-8'))
+                        except:
+                            pass
                     self.state[names_cnt] = "waiting"
                     self.playerSockets.append(c)
                 _thread.start_new_thread(
@@ -103,35 +106,45 @@ class GameServer:
             try:
                 msg = clientsocket.recv(1024).decode('utf-8')
                 if not msg: raise
-                msg = msg.rstrip("pos$")
-                m = msg.split('$')
-                if m[0] == "start":
-                    self.seed = random.randint(0,10000)
-                    for i, p in enumerate(self.playerSockets):
-                        p.send(("start$"+str(self.seed)).encode('utf-8'))
-                        self.state[i] = "started"
-                    self.serverSocket.send(("startgame$").encode('utf-8'))
-                    self.game_started = True
-                elif m[0] == "pos":
-                    print(msg)
-                    #print(addr, ' >> ', m2 , ' >> ', len(m2))
-                    if len(m[1]) != 0:
-                        self.positions[num] = m[1]
-                    nmsg = "pos$"+str(self.positions)
-                    clientsocket.send(nmsg.encode('utf-8'))
-                elif m[0] == "chat":
-                    for p in self.playerSockets:
-                        p.send(("chat$"+name+"$"+m[1]).encode('utf-8'))
-                elif m[0] == "finish":
-                    self.state[num] = "finished"
-                    self.finished += 1
-                    self.rank[num] = self.finished
-                    clientsocket.send(("rank$"+str(self.finished)).encode('utf-8'))
-                    if self.state.count("started") == 0:
-                        #print(self.state)
-                        self.gameEnded = True
-                        for p in self.playerSockets:
-                            p.send(("end$"+str(self.rank[0])+str(self.rank[1])+str(self.rank[2])+str(self.rank[3])).encode('utf-8'))
+                for token in msg.split('~'):
+                    if len(token) > 1:
+                        m = token.split('$')
+                        if m[0] == "start":
+                            self.seed = random.randint(0,10000)
+                            for i, p in enumerate(self.playerSockets):
+                                try:
+                                    p.send(("start$"+str(self.seed)).encode('utf-8'))
+                                    self.state[i] = "started"
+                                except:
+                                    pass
+                            self.serverSocket.send(("startgame$").encode('utf-8'))
+                            self.game_started = True
+                        elif m[0] == "pos":
+                            print(msg)
+                            #print(addr, ' >> ', m2 , ' >> ', len(m2))
+                            if len(m[1]) != 0:
+                                self.positions[num] = m[1]
+                            nmsg = "pos$"+str(self.positions)
+                            clientsocket.send(nmsg.encode('utf-8'))
+                        elif m[0] == "chat":
+                            for p in self.playerSockets:
+                                try:
+                                    p.send(("chat$"+name+"$"+m[1]).encode('utf-8'))
+                                except:
+                                    pass
+                        elif m[0] == "finish":
+                            self.state[num] = "finished"
+                            self.finished += 1
+                            self.rank[num] = self.finished
+                            clientsocket.send(("rank$"+str(self.finished)).encode('utf-8'))
+                            if self.state.count("started") == 0:
+                                #print(self.state)
+                                self.gameEnded = True
+                                for p in self.playerSockets:
+                                    try:
+                                        p.send(("end$"+str(self.rank[0])+str(self.rank[1])+str(self.rank[2])+str(self.rank[3])).encode('utf-8'))
+                                    except:
+                                        pass
             except Exception as e:
                 print(name + " disconnected" + " : " + str(e))
                 self.state[num] = "disconnected"

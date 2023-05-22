@@ -139,7 +139,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 			try{
 				if (Time.fixedTime >= timeToGo) {
 				Debug.Log("pos$"+MainPlayerTrans.position.ToString());
-				byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("pos$"+MainPlayerTrans.position.ToString()+"$");
+				byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("pos$"+MainPlayerTrans.position.ToString()+"~");
 				nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 				timeToGo = Time.fixedTime + timeOffset;
 				}
@@ -204,7 +204,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 	}
 
 	public void sendChat(String s){
-		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("chat$"+s+"$");
+		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("chat$"+s+"~");
 		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 	}
 
@@ -222,12 +222,12 @@ public class SecondServerSocketScript : MonoBehaviour {
 	}
 		
 	public void sendStartSignal(){
-		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("start$");
+		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("start$"+"~");
 		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 	}
 	
 	public void sendFinishSignal(){
-		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("finish$");
+		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("finish$"+"~");
 		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 	}
 	private void OnApplicationQuit() {
