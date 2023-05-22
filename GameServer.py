@@ -6,10 +6,6 @@ from pymongo.server_api import ServerApi
 import time
 import uuid
 
-
-
-
-
 class GameServer:
     names = []
     game_started = False
@@ -20,6 +16,7 @@ class GameServer:
     playerSockets = []
     gameEnded = False
     serverSocket = None
+    finished = 0
 
     def newGameServer(self,port):    
         while True:
@@ -59,6 +56,7 @@ class GameServer:
                     names_cnt = self.names.index(name)
                     self.state[names_cnt] = 'started'
                     c.send((str(names_cnt) + "$" + str(self.names)).encode('utf-8'))
+                    self.playerSockets[names_cnt] = c
                     alrd = True
                 else:
                     self.names.append(name)
@@ -67,7 +65,7 @@ class GameServer:
                     for p in self.playerSockets:
                         p.send(("join$" + name).encode('utf-8'))
                     self.state[names_cnt] = "waiting"
-                self.playerSockets.append(c)
+                    self.playerSockets.append(c)
                 _thread.start_new_thread(
                     self.on_new_client, (c, name, names_cnt, alrd))
 
@@ -100,8 +98,9 @@ class GameServer:
                         p.send(("chat$"+name+"$"+m2).encode('utf-8'))
                 elif m1 == "finish":
                     self.state[num] = "finished"
-                    self.rank[num] = self.state.count("finished")
-                    clientsocket.send(("rank$"+str(self.state.count("finished"))).encode('utf-8'))
+                    self.finished += 1
+                    self.rank[num] = self.finished
+                    clientsocket.send(("rank$"+str(self.finished)).encode('utf-8'))
                     if self.state.count("started") == 0:
                         #print(self.state)
                         self.gameEnded = True
@@ -110,6 +109,13 @@ class GameServer:
             except Exception as e:
                 print(name + " disconnected" + " : " + str(e))
                 self.state[num] = "disconnected"
+                if not self.game_started:
+                    self.playerSockets.remove(clientsocket)
+                    self.names.remove(name)
+                    self.state.pop(num)
+                    self.state.append("NA")
+                for i, p in enumerate(self.playerSockets):
+                    p.send(("dc$"+name+"$"+str(i)).encode('utf-8'))
                 self.serverSocket.send(('dc$' + name).encode('utf-8'))
                 if (self.state.count("disconnected") + self.state.count("NA")) == 4:
                     print("hehehe")

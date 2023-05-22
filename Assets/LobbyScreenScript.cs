@@ -51,6 +51,24 @@ public class LobbyScreenScript : MonoBehaviour
         
     }
 
+    public void disconnectedName(String s){
+        Names.Remove(s);
+        PlayerPrefs.SetString("Players","["+string.Join(", ", Names.ToArray())+"]");
+        PlayerNameTags = GameObject.FindGameObjectsWithTag("PlayerNameTag");
+        for(int i = 0; i < Names.Count(); i++){
+            PlayerNameTags[i].GetComponentInChildren<Text>().text =  (i+1).ToString() + "  " + Names[i];
+        }
+        for(int i = Names.Count(); i < 4; i++){
+            PlayerNameTags[i].GetComponentInChildren<Text>().text = (i+1).ToString();
+        }
+        if(PlayerPrefs.GetInt("playerCount") != 0){
+            gameStartBtn.interactable = false;
+        }else{
+            gameStartBtn.interactable = true;
+        }
+        
+    }
+
     public void StartGame(){
         FindObjectOfType<SecondServerSocketScript>().sendStartSignal();
     }

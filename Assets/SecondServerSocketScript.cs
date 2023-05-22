@@ -32,6 +32,8 @@ public class SecondServerSocketScript : MonoBehaviour {
 	private string rankings;
 	private int seed;
 	private int rank = 0;
+	private string dcname;
+	private bool dcN;
 
 
 	private NetworkStream nwStream;
@@ -44,6 +46,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 
 	public Transform[] Players;
 	private int playernum;
+	private int newCount;
 
 	private String Positions = "['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)']";
 
@@ -52,6 +55,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 
 	private int PORT_NO = 0;
     private string SERVER_IP = "";
+	private bool raceEndeed = false;
 	
 
 	void Awake(){
@@ -120,6 +124,10 @@ public class SecondServerSocketScript : MonoBehaviour {
 			}else if(msg[0]=="end"){
 				rankings = msg[1];
 				gE = true;
+			}else if(msg[0] == "dc"){
+				dcname = msg[1];
+				newCount = int.Parse(msg[2]);
+				dcN = true;
 			}
 
 		}	
@@ -161,7 +169,10 @@ public class SecondServerSocketScript : MonoBehaviour {
 			Debug.Log(chatSender+chatMessage);
 			if(raceStarted){
 				FindObjectOfType<GameManagerScript>().chatView(chatSender,chatMessage);
-			}else{
+			}else if(raceEndeed){
+				FindObjectOfType<EndSceneManager>().chatView(chatSender,chatMessage);
+			}
+			else{
 				FindObjectOfType<LobbyScreenScript>().chatView(chatSender,chatMessage);
 			}
 			cR = false;
@@ -169,12 +180,24 @@ public class SecondServerSocketScript : MonoBehaviour {
 		if(fR){
 			FindObjectOfType<GameManagerScript>().recievedRank(rank);
 			fR = false;
-		}if(gE){
+		}
+		if(gE){
 			raceStarted = false;
+			raceEndeed = true;
 			PlayerPrefs.SetString("ranking",rankings);
 			FindObjectOfType<GameManagerScript>().EndGame();
 			gE = false;
-			//Destroy(gameObject);
+		}
+		if(dcN){
+			if(raceStarted){
+				FindObjectOfType<GameManagerScript>().chatView("admin",(dcname+" disconnecteed"));
+			}else if(!raceEndeed){
+				playernum = newCount;
+				PlayerPrefs.SetInt("playerCount", newCount);
+				FindObjectOfType<LobbyScreenScript>().disconnectedName(dcname);
+				FindObjectOfType<LobbyScreenScript>().chatView("admin",(dcname+" disconnected"));
+			}
+			dcN = false;
 		}
 	}
 

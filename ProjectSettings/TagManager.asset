@@ -11,6 +11,7 @@ TagManager:
   - Player2Car
   - Player3Car
   - Player4Car
+  - FSS
   layers:
   - Default
   - TransparentFX

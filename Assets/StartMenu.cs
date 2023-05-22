@@ -12,7 +12,10 @@ public class StartMenu : MonoBehaviour
     public InputField NameInputField; 
     public GameObject ErrorText;
     public GameObject CreditsCanvas;
-
+    public GameObject LobbyScreenCanvas;
+    public GameObject MatchScreenCanvas;
+    public GameObject FSS;
+    public GameObject SSS;
  //replace local host with your device ip
 
     void Start()
@@ -33,6 +36,14 @@ public class StartMenu : MonoBehaviour
 
     public void CloseCredits(){
         CreditsCanvas.SetActive(false);
+    }
+
+    public void CloseBtn(){
+        MatchScreenCanvas.SetActive(false);
+        LobbyScreenCanvas.SetActive(false);
+        FSS.SetActive(false);
+        SSS.SetActive(false);
+        FSS.SetActive(true);
     }
 
     public void StartGame(){

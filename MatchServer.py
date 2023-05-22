@@ -9,7 +9,7 @@ s = socket.socket()
 host = socket.gethostname()
 port=50001
 OfflineGameServers = {"0", '192.168.56.1#50002', '192.168.56.1#50003', '192.168.56.1#50004', '192.168.56.1#50005', '192.168.56.1#50006', '192.168.56.1#50007'}
-GameServersLobbyIDS = {"0":"0", '192.168.56.1#50002':0, '192.168.56.1#50003':0, '192.168.56.1#50004':0, '192.168.56.1#50005':0, '192.168.56.1#50006':0, '192.168.56.1#50007':0}
+GameServersLobbyIDS = {"0":"0", '192.168.56.1#50002':"0", '192.168.56.1#50003':"0", '192.168.56.1#50004':"0", '192.168.56.1#50005':"0", '192.168.56.1#50006':"0", '192.168.56.1#50007':"0"}
 #ygf ip 192.168.1.32
 #antoon ip 192.168.56.1
 #kero ip 192.168.126.1
@@ -50,6 +50,7 @@ def on_new_server(serversocket, Sname):
                 elif Sname in PlayingGameServers and msgs[1] in PlayingGameServers[Sname]:
                     PlayingGameServers[Sname].remove(msgs[1]) 
             elif msgs[0] == "dblobbyid":
+                GameServersLobbyIDS[Sname] = msgs[1]
                 print(msgs[1])
         except Exception as e:
             print(e)
