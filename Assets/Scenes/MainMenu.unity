@@ -949,6 +949,10 @@ MonoBehaviour:
   NameInputField: {fileID: 2125731209}
   ErrorText: {fileID: 1661092413}
   CreditsCanvas: {fileID: 1836962510}
+  LobbyScreenCanvas: {fileID: 1967531259}
+  MatchScreenCanvas: {fileID: 1054663222}
+  FSS: {fileID: 1107058413}
+  SSS: {fileID: 507591536}
 --- !u!1 &393139450
 GameObject:
   m_ObjectHideFlags: 0
