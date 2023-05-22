@@ -12,8 +12,8 @@ PlayingGameServers = {"0":['0','0','0','0']}
 s = socket.socket()
 host = socket.gethostname()
 port=50001
-OfflineGameServers = {"0", '192.168.56.1#50002', '192.168.56.1#50003', '192.168.56.1#50004', '192.168.56.1#50005', '192.168.56.1#50006', '192.168.56.1#50007'}
-GameServersLobbyIDS = {"0":"0", '192.168.56.1#50002':"0", '192.168.56.1#50003':"0", '192.168.56.1#50004':"0", '192.168.56.1#50005':"0", '192.168.56.1#50006':"0", '192.168.56.1#50007':"0"}
+#OfflineGameServers = {"0", '192.168.56.1#50002', '192.168.56.1#50003', '192.168.56.1#50004', '192.168.56.1#50005', '192.168.56.1#50006', '192.168.56.1#50007'}
+GameServersLobbyIDS = {"0":"0"}
 #ygf ip 192.168.1.32
 #antoon ip 192.168.56.1
 #kero ip 192.168.126.1
@@ -65,7 +65,7 @@ def on_new_server(serversocket, Sname):
                 InGameServers.pop(Sname)
             if Sname in ReadyGameServers:
                 ReadyGameServers.pop(Sname)
-            OfflineGameServers.add(Sname)
+            #OfflineGameServers.add(Sname)
             connected = False
     print("connectionLost")
     serversocket.close()
@@ -116,9 +116,10 @@ while True:
         c.send("ok".encode('utf-8'))
         msg = c.recv(1024).decode('utf-8')
         msg = msg.split('$')
-        if msg[1] == "wokenup":
-            OfflineGameServers.remove(addr[0]+'#'+msg[0])
+        #if msg[1] == "wokenup":
+            #OfflineGameServers.remove(addr[0]+'#'+msg[0])
         ReadyGameServers.update({(addr[0]+'#'+msg[0]) : []})
+        GameServersLobbyIDS.update({(addr[0]+'#'+msg[0]):"0"})
         c.send("ready".encode('utf-8'))
         _thread.start_new_thread(on_new_server,(c,(addr[0]+'#'+msg[0])))
     elif msg == "user":
