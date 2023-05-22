@@ -64,6 +64,7 @@ public class SecondServerSocketScript : MonoBehaviour {
             instance = this;
             DontDestroyOnLoad(gameObject);
 			Startpositions = PlayerPrefs.GetString("startpos");
+			Debug.Log(PlayerPrefs.GetString("Server"));
 			SERVER_IP = PlayerPrefs.GetString("Server").Split("#"[0])[0];
 			PORT_NO = int.Parse(PlayerPrefs.GetString("Server").Split("#"[0])[1]);
 			try {  			

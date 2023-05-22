@@ -49,7 +49,7 @@ class GameServer:
             self.serverSocket.connect((matchS, 50001))
             self.serverSocket.send("server".encode('utf-8'))
             self.serverSocket.recv(1024).decode('utf-8')
-            self.serverSocket.send((str(port)+"$wokenup").encode('utf-8'))
+            self.serverSocket.send((str(port)+"$http://ec2-54-158-41-118.compute-1.amazonaws.com/").encode('utf-8'))
             msg = self.serverSocket.recv(1024).decode('utf-8')
             online = False
             running = False

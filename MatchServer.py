@@ -118,10 +118,10 @@ while True:
         msg = msg.split('$')
         #if msg[1] == "wokenup":
             #OfflineGameServers.remove(addr[0]+'#'+msg[0])
-        ReadyGameServers.update({(addr[0]+'#'+msg[0]) : []})
-        GameServersLobbyIDS.update({(addr[0]+'#'+msg[0]):"0"})
+        ReadyGameServers.update({(msg[1]+'#'+msg[0]) : []})
+        GameServersLobbyIDS.update({(msg[1]+'#'+msg[0]):"0"})
         c.send("ready".encode('utf-8'))
-        _thread.start_new_thread(on_new_server,(c,(addr[0]+'#'+msg[0])))
+        _thread.start_new_thread(on_new_server,(c,(msg[1]+'#'+msg[0])))
     elif msg == "user":
         c.send("ok".encode('utf-8'))
         msg = c.recv(1024).decode('utf-8').lower()
