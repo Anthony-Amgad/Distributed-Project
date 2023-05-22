@@ -103,32 +103,38 @@ public class SecondServerSocketScript : MonoBehaviour {
 		while(true){
 			byte[] bytesToRead = new byte[socketConnection.ReceiveBufferSize];
 			int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
-			String[] msg = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead).Split("$"[0]);
-			if(msg[0] == "pos" && raceStarted){
-				Positions = msg[1];
+			String[] token = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead).Split("~"[0]);
+			for(int i = 0; i < token.Length; i++){
+				if(token[i].Length > 1){
+					String[] msg = token[i].Split("$"[0]);
+					if(msg[0] == "pos" && raceStarted){
+						Positions = msg[1];
+					}
+					else if(msg[0] == "join"){				
+						nts = msg[1];
+						uN = true;
+					}else if(msg[0] == "start"){
+						seed = int.Parse(msg[1]);
+						sR = true;
+					}
+					else if(msg[0]=="chat"){
+						chatSender = msg[1];
+						chatMessage = msg[2];
+						cR = true;
+					}else if(msg[0]=="rank"){
+						rank = int.Parse(msg[1]);
+						fR = true;
+					}else if(msg[0]=="end"){
+						rankings = msg[1];
+						gE = true;
+					}else if(msg[0] == "dc"){
+						dcname = msg[1];
+						newCount = int.Parse(msg[2]);
+						dcN = true;
+					}
+				}
 			}
-			else if(msg[0] == "join"){				
-				nts = msg[1];
-				uN = true;
-			}else if(msg[0] == "start"){
-				seed = int.Parse(msg[1]);
-				sR = true;
-			}
-			else if(msg[0]=="chat"){
-				chatSender = msg[1];
-				chatMessage = msg[2];
-				cR = true;
-			}else if(msg[0]=="rank"){
-				rank = int.Parse(msg[1]);
-				fR = true;
-			}else if(msg[0]=="end"){
-				rankings = msg[1];
-				gE = true;
-			}else if(msg[0] == "dc"){
-				dcname = msg[1];
-				newCount = int.Parse(msg[2]);
-				dcN = true;
-			}
+			
 
 		}	
 	}
@@ -138,7 +144,6 @@ public class SecondServerSocketScript : MonoBehaviour {
 		if(raceStarted){
 			try{
 				if (Time.fixedTime >= timeToGo) {
-				Debug.Log("pos$"+MainPlayerTrans.position.ToString());
 				byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("pos$"+MainPlayerTrans.position.ToString()+"~");
 				nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 				timeToGo = Time.fixedTime + timeOffset;
@@ -146,7 +151,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 			}catch(Exception e){
 				Debug.Log(e.Message);
 			}
-			Debug.Log(Positions);
+			//Debug.Log(Positions);
 			String[] tempos = StringsArrayFromString(Positions);
 			FindObjectOfType<GameManagerScript>().updategpoints(tempos, playernum);
 			//Debug.Log(Positions);
