@@ -44,12 +44,13 @@ class GameServer:
         self.finished = 0   
         while True:
             host = socket.gethostname()
-            matchS = socket.gethostbyname("ec2-54-196-191-35.compute-1.amazonaws.com")
+            #matchS = socket.gethostbyname("ec2-54-196-191-35.compute-1.amazonaws.com") #fordeployment
+            matchS = "192.168.56.1"
             self.serverSocket = socket.socket()
             self.serverSocket.connect((matchS, 50001))
             self.serverSocket.send("server".encode('utf-8'))
             self.serverSocket.recv(1024).decode('utf-8')
-            self.serverSocket.send((str(port)+"$ec2-54-158-41-118.compute-1.amazonaws.com").encode('utf-8'))
+            self.serverSocket.send((str(port)+"$"+matchS).encode('utf-8'))
             msg = self.serverSocket.recv(1024).decode('utf-8')
             online = False
             running = False
@@ -120,13 +121,14 @@ class GameServer:
                             self.serverSocket.send(("startgame$").encode('utf-8'))
                             self.game_started = True
                         elif m[0] == "pos":
-                            print(msg)
+                            #print(msg)
                             #print(addr, ' >> ', m2 , ' >> ', len(m2))
                             if len(m[1]) != 0:
                                 self.positions[num] = m[1]
                             nmsg = "pos$"+str(self.positions)
                             clientsocket.send((nmsg+"~").encode('utf-8'))
                         elif m[0] == "chat":
+                            print(m)
                             for p in self.playerSockets:
                                 try:
                                     p.send(("chat$"+name+"$"+m[1]+"~").encode('utf-8'))

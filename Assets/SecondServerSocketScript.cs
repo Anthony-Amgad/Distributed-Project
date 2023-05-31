@@ -33,6 +33,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 	private int rank = 0;
 	private string dcname;
 	private bool dcN;
+	private bool pR = false;
 
 
 	private NetworkStream nwStream;
@@ -56,7 +57,7 @@ public class SecondServerSocketScript : MonoBehaviour {
     private string SERVER_IP = "";
 	private bool raceEndeed = false;
 	
-
+	
 	void Awake(){
         if(instance != null){
             Destroy(gameObject);
@@ -107,8 +108,10 @@ public class SecondServerSocketScript : MonoBehaviour {
 			for(int i = 0; i < token.Length; i++){
 				if(token[i].Length > 1){
 					String[] msg = token[i].Split("$"[0]);
-					if(msg[0] == "pos" && raceStarted){
+					if(msg[0] == "pos" && raceStarted && !pR){	
 						Positions = msg[1];
+						Debug.Log(Positions);
+						pR = true;
 					}
 					else if(msg[0] == "join"){				
 						nts = msg[1];
@@ -152,16 +155,19 @@ public class SecondServerSocketScript : MonoBehaviour {
 				Debug.Log(e.Message);
 			}
 			//Debug.Log(Positions);
-			String[] tempos = StringsArrayFromString(Positions);
-			FindObjectOfType<GameManagerScript>().updategpoints(tempos, playernum);
-			//Debug.Log(Positions);
-			//Debug.Log(tempos.Length);
-			//Debug.Log(tempos[0]+"||"+tempos[1]+"||"+tempos[2]+"||"+tempos[3]+"||"+tempos[4]+"||"+tempos[5]+"||"+tempos[6]+"||"+tempos[7]);
-			for(int i = 0; i < tempos.Length; i+=2){
-				if((i/2) != playernum){
-					Players[(i/2)].position = Vector3FromString(tempos[i]);
+			if(pR){
+				String[] tempos = StringsArrayFromString(Positions);
+				FindObjectOfType<GameManagerScript>().updategpoints(tempos, playernum);
+				//Debug.Log(Positions);
+				//Debug.Log(tempos.Length);
+				//Debug.Log(tempos[0]+"||"+tempos[1]+"||"+tempos[2]+"||"+tempos[3]+"||"+tempos[4]+"||"+tempos[5]+"||"+tempos[6]+"||"+tempos[7]);
+				for(int i = 0; i < tempos.Length; i+=2){
+					if((i/2) != playernum){
+						Players[(i/2)].position = Vector3FromString(tempos[i]);
+					}
 				}
-			}
+				pR = false;
+			}	
 		}
 		if(uN){
 			FindObjectOfType<LobbyScreenScript>().UpdateNames(nts);
@@ -236,6 +242,27 @@ public class SecondServerSocketScript : MonoBehaviour {
 		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
 	}
 	private void OnApplicationQuit() {
+		try
+		{
+			socketConnection.Close();
+		}
+		catch(Exception e)
+		{
+			Debug.Log(e.Message);
+		}
+	}
+	private void OnDestroy() {
+		try
+		{
+			socketConnection.Close();
+		}
+		catch(Exception e)
+		{
+			Debug.Log(e.Message);
+		}
+	}
+
+	private void OnDisable() {
 		try
 		{
 			socketConnection.Close();

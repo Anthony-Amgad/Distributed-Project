@@ -23,7 +23,8 @@ public class FirstServerSocketScript : MonoBehaviour
     public GameObject LobbyCanvas;
 
     const int PORT_NO = 50001;
-    const string SERVER_IP = "ec2-54-196-191-35.compute-1.amazonaws.com";
+    //const string SERVER_IP = "ec2-54-196-191-35.compute-1.amazonaws.com";
+    const string SERVER_IP = "192.168.56.1";
     void Awake(){
         if(instance != null){
             Destroy(gameObject);
@@ -83,17 +84,6 @@ public class FirstServerSocketScript : MonoBehaviour
         }
     }
 
-    private void OnApplicationQuit() {
-		try
-		{
-			socketConnection.Close();
-		}
-		catch(Exception e)
-		{
-			Debug.Log(e.Message);
-		}
-	}
-
     public void CreateLobby(){
         byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("new$");
 		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
@@ -121,4 +111,37 @@ public class FirstServerSocketScript : MonoBehaviour
         }
         
     }
+    
+        private void OnApplicationQuit() {
+		try
+		{
+			socketConnection.Close();
+		}
+		catch(Exception e)
+		{
+			Debug.Log(e.Message);
+		}
+	}
+    
+    private void OnDestroy() {
+		try
+		{
+			socketConnection.Close();
+		}
+		catch(Exception e)
+		{
+			Debug.Log(e.Message);
+		}
+	}
+
+	private void OnDisable() {
+		try
+		{
+			socketConnection.Close();
+		}
+		catch(Exception e)
+		{
+			Debug.Log(e.Message);
+		}
+	}
 }
