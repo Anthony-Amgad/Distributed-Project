@@ -24,7 +24,7 @@ public class FirstServerSocketScript : MonoBehaviour
 
     const int PORT_NO = 50001;
     //const string SERVER_IP = "ec2-54-196-191-35.compute-1.amazonaws.com";
-    const string SERVER_IP = "192.168.56.1";
+    private string SERVER_IP = System.Environment.MachineName; //FOR LOCAL RUNS
     void Awake(){
         if(instance != null){
             Destroy(gameObject);
