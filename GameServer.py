@@ -186,12 +186,12 @@ class GameServer:
             while(not self.game_started):
                 pass
             lobby_id = str(uuid.uuid4())
-            lobbyRecords.insert_one({"lobby_id": lobby_id})
+            lobbyRecords.insert_one({"lobby_id": lobby_id,
+                                    "lobby_players":self.names})
             self.serverSocket.send(("dblobbyid$"+lobby_id).encode('utf-8'))
             #currentTime = time.time()       
             while(self.game_started):
-                posRecords.insert_one({"lobby_id": lobby_id,
-                                    "lobby_players":self.names, 
+                posRecords.insert_one({"lobby_id": lobby_id, 
                                     "timestamp": time.time(), 
                                     "positions": self.positions})
                 #print(str(time.time()-currentTime))
