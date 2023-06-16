@@ -60,8 +60,12 @@ def on_new_server(serversocket, Sname):
         except Exception as e:
             print(e)
             if Sname in PlayingGameServers:
+                for name in PlayingGameServers[Sname]:
+                    NamesConnected.pop(name)
                 PlayingGameServers.pop(Sname)
             if Sname in InGameServers:
+                for name in InGameServers[Sname]:
+                    NamesConnected.pop(name)
                 InGameServers.pop(Sname)
             if Sname in ReadyGameServers:
                 ReadyGameServers.pop(Sname)
@@ -88,12 +92,16 @@ def on_new_client(clientsocket, name):
             elif msgs[0] == "join":
                 if len(PlayingGameServers[msgs[1]]) < 4:
                     clientsocket.send("ok".encode('utf-8'))
+                else:
+                    clientsocket.send("no".encode('utf-8'))
         except:
-            if NamesConnected[name] == 'ingame':
-                NamesConnected[name] = 'disconnected'
-            else:
-                NamesConnected.pop(name)
+            if name in NamesConnected:
+                if NamesConnected[name] == 'ingame':
+                    NamesConnected[name] = 'disconnected'
+                else:
+                    NamesConnected.pop(name)
             connected = False
+            print(name + " dc")
     clientsocket.close()
 
 db_ip = "ec2-54-162-162-190.compute-1.amazonaws.com"
@@ -133,7 +141,10 @@ while True:
             found = 0
             for key in InGameServers.keys():
                 if msg in InGameServers[key]:
-                    positions = posRecords.find({'lobby_id': GameServersLobbyIDS[key]}).sort('timestamp', -1).limit(1)
+                    try:
+                        positions = posRecords.find({'lobby_id': GameServersLobbyIDS[key]}).sort('timestamp', -1).limit(1)
+                    except:
+                        positions = ['(2.2,1.5,0.0)','(-2.7,1.5,0.0)','(-7.8,1.5,0.0)','(7.4,1.5,0.0)']
                     c.send(('ingame$' + key + '$' + str(positions[0]['positions'])).encode('utf-8'))
                     found = 1
                     break

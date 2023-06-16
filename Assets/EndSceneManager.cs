@@ -52,8 +52,8 @@ public class EndSceneManager : MonoBehaviour
     }
 
     public void leaveGame(){
-        Destroy(FindObjectOfType<SecondServerSocketScript>());
-        Destroy(FindObjectOfType<FirstServerSocketScript>());
+        Destroy(GameObject.Find("SecondServerSocket"));
+        Destroy(GameObject.Find("FirstServerSocket"));
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 2);
     }
 

@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class StartMenu : MonoBehaviour
@@ -39,11 +40,9 @@ public class StartMenu : MonoBehaviour
     }
 
     public void CloseBtn(){
-        MatchScreenCanvas.SetActive(false);
-        LobbyScreenCanvas.SetActive(false);
-        FSS.SetActive(false);
-        SSS.SetActive(false);
-        FSS.SetActive(true);
+        Destroy(GameObject.Find("SecondServerSocket"));
+        Destroy(GameObject.Find("FirstServerSocket"));
+        SceneManager.LoadScene(0);
     }
 
     public void StartGame(){

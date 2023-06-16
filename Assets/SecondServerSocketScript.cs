@@ -5,7 +5,7 @@ using System.Threading;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
-
+using System.Collections;
 
 public class SecondServerSocketScript : MonoBehaviour {  	
 
@@ -25,6 +25,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 	private bool cR = false;
 	private bool fR = false;
 	private bool gE = false;
+	private bool lC = false;
 	private string nts;
 	private string chatSender;
 	private string chatMessage;
@@ -70,22 +71,27 @@ public class SecondServerSocketScript : MonoBehaviour {
 			PORT_NO = int.Parse(PlayerPrefs.GetString("Server").Split("#"[0])[1]);
 			try {  			
 				socketConnection = new TcpClient(SERVER_IP, PORT_NO);
-				nwStream = socketConnection.GetStream();		
+				nwStream = socketConnection.GetStream();
+				byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes(PlayerPrefs.GetString("MainName"));
+				nwStream.Write(bytesToSend, 0, bytesToSend.Length);
+				byte[] bytesToRead = new byte[socketConnection.ReceiveBufferSize];
+				int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
+				String[] msg = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead).Split("$"[0]);
+				PlayerPrefs.SetInt("playerCount",int.Parse(msg[0]));
+				playernum = int.Parse(msg[0]);
+				PlayerPrefs.SetString("Players", msg[1]);
+				Thread thread = new Thread(new ThreadStart(Listen));
+				thread.Start();
+				ready = true;		
 			} 		
-			catch (Exception e) { 			
-				Debug.Log("On client connect exception " + e); 		
+			catch (Exception e) {
+				PlayerPrefs.SetString("Connection","Lost");
+				FindObjectOfType<FirstServerSocketScript>().resetInst();
+				Destroy(GameObject.Find("FirstServerSocket"));
+				instance = null;
+				SceneManager.LoadScene(0);
+				Destroy(gameObject);	
 			}
-			byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes(PlayerPrefs.GetString("MainName"));
-			nwStream.Write(bytesToSend, 0, bytesToSend.Length);
-			byte[] bytesToRead = new byte[socketConnection.ReceiveBufferSize];
-			int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
-			String[] msg = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead).Split("$"[0]);
-			PlayerPrefs.SetInt("playerCount",int.Parse(msg[0]));
-			playernum = int.Parse(msg[0]);
-			PlayerPrefs.SetString("Players", msg[1]);
-			Thread thread = new Thread(new ThreadStart(Listen));
-			thread.Start();
-			ready = true;
         }
     }
 
@@ -102,43 +108,45 @@ public class SecondServerSocketScript : MonoBehaviour {
 	//Listening thread for any other players
 	void Listen(){
 		while(true){
-			byte[] bytesToRead = new byte[socketConnection.ReceiveBufferSize];
-			int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
-			String[] token = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead).Split("~"[0]);
-			for(int i = 0; i < token.Length; i++){
-				if(token[i].Length > 1){
-					String[] msg = token[i].Split("$"[0]);
-					if(msg[0] == "pos" && raceStarted && !pR){	
-						Positions = msg[1];
-						Debug.Log(Positions);
-						pR = true;
-					}
-					else if(msg[0] == "join"){				
-						nts = msg[1];
-						uN = true;
-					}else if(msg[0] == "start"){
-						seed = int.Parse(msg[1]);
-						sR = true;
-					}
-					else if(msg[0]=="chat"){
-						chatSender = msg[1];
-						chatMessage = msg[2];
-						cR = true;
-					}else if(msg[0]=="rank"){
-						rank = int.Parse(msg[1]);
-						fR = true;
-					}else if(msg[0]=="end"){
-						rankings = msg[1];
-						gE = true;
-					}else if(msg[0] == "dc"){
-						dcname = msg[1];
-						newCount = int.Parse(msg[2]);
-						dcN = true;
+			try{
+				byte[] bytesToRead = new byte[socketConnection.ReceiveBufferSize];
+				int bytesRead = nwStream.Read(bytesToRead, 0, socketConnection.ReceiveBufferSize);
+				String[] token = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead).Split("~"[0]);
+				for(int i = 0; i < token.Length; i++){
+					if(token[i].Length > 1){
+						String[] msg = token[i].Split("$"[0]);
+						if(msg[0] == "pos" && raceStarted && !pR){	
+							Positions = msg[1];
+							Debug.Log(Positions);
+							pR = true;
+						}
+						else if(msg[0] == "join"){				
+							nts = msg[1];
+							uN = true;
+						}else if(msg[0] == "start"){
+							seed = int.Parse(msg[1]);
+							sR = true;
+						}
+						else if(msg[0]=="chat"){
+							chatSender = msg[1];
+							chatMessage = msg[2];
+							cR = true;
+						}else if(msg[0]=="rank"){
+							rank = int.Parse(msg[1]);
+							fR = true;
+						}else if(msg[0]=="end"){
+							rankings = msg[1];
+							gE = true;
+						}else if(msg[0] == "dc"){
+							dcname = msg[1];
+							newCount = int.Parse(msg[2]);
+							dcN = true;
+						}
 					}
 				}
+			}catch(Exception e){
+				lC = true;
 			}
-			
-
 		}	
 	}
 	
@@ -152,7 +160,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 				timeToGo = Time.fixedTime + timeOffset;
 				}
 			}catch(Exception e){
-				Debug.Log(e.Message);
+				lC = true;
 			}
 			//Debug.Log(Positions);
 			if(pR){
@@ -212,15 +220,32 @@ public class SecondServerSocketScript : MonoBehaviour {
 			}
 			dcN = false;
 		}
+		if(lC){
+			lC = false;
+			StartCoroutine(DC());
+		}
+	}
+
+	private IEnumerator DC(){
+		PlayerPrefs.SetString("Connection","Lost");
+		FindObjectOfType<FirstServerSocketScript>().resetInst();
+		Destroy(GameObject.Find("FirstServerSocket"));
+		instance = null;
+		yield return new WaitForSeconds(1);
+		SceneManager.LoadScene(0);
+		Destroy(gameObject);
 	}
 
 	public void sendChat(String s){
-		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("chat$"+s+"~");
-		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
+		try{
+			byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("chat$"+s+"~");
+			nwStream.Write(bytesToSend, 0, bytesToSend.Length);
+		}catch(Exception e){
+			lC = true;
+		}	
 	}
 
 	public void onSecondSceeneLoad(Transform[] playertranss){
-		
 		Players = playertranss;
 		MainPlayerObject = GameObject.FindGameObjectWithTag("MainPlayer");
 		MainPlayerTrans = MainPlayerObject.GetComponent<Transform>();
@@ -233,13 +258,22 @@ public class SecondServerSocketScript : MonoBehaviour {
 	}
 		
 	public void sendStartSignal(){
-		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("start$"+"~");
-		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
+		try{
+			byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("start$"+"~");
+			nwStream.Write(bytesToSend, 0, bytesToSend.Length);
+		}catch(Exception e){
+			lC = true;
+		}	
 	}
 	
 	public void sendFinishSignal(){
-		byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("finish$"+"~");
-		nwStream.Write(bytesToSend, 0, bytesToSend.Length);
+		try{
+			byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("finish$"+"~");
+			nwStream.Write(bytesToSend, 0, bytesToSend.Length);
+		}catch{
+			lC = true;
+		}
+		
 	}
 	private void OnApplicationQuit() {
 		try
