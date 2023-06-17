@@ -23,8 +23,8 @@ public class FirstServerSocketScript : MonoBehaviour
     public GameObject LobbyCanvas;
 
     const int PORT_NO = 50001;
-    //const string SERVER_IP = "ec2-54-196-191-35.compute-1.amazonaws.com";
-    private string SERVER_IP = System.Environment.MachineName; //FOR LOCAL RUNS
+    const string SERVER_IP = "ec2-44-202-243-81.compute-1.amazonaws.com";
+    //private string SERVER_IP = System.Environment.MachineName; //FOR LOCAL RUNS
     
     void Awake(){
         if(instance != null){

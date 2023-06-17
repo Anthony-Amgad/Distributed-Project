@@ -104,8 +104,8 @@ def on_new_client(clientsocket, name):
             print(name + " dc")
     clientsocket.close()
 
-db_ip = "ec2-54-162-162-190.compute-1.amazonaws.com"
-db_port = 28041
+db_ip = "ec2-54-242-253-85.compute-1.amazonaws.com"
+db_port = 27017
 # Create a new client and connect to the primary server
 mongoClient = MongoClient(db_ip, db_port)
 posRecords = mongoClient['racingGameDB']['Positions']

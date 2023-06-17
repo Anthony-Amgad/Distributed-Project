@@ -44,13 +44,14 @@ class GameServer:
         self.finished = 0   
         while True:
             host = socket.gethostname()
-            #matchS = socket.gethostbyname("ec2-54-196-191-35.compute-1.amazonaws.com") #fordeployment
-            matchS = "192.168.56.1"
+            hostName = "ec2-54-211-138-31.compute-1.amazonaws.com"
+            matchS = socket.gethostbyname("ec2-44-202-243-81.compute-1.amazonaws.com") #fordeployment
+            #matchS = "192.168.56.1"
             self.serverSocket = socket.socket()
             self.serverSocket.connect((matchS, 50001))
             self.serverSocket.send("server".encode('utf-8'))
             self.serverSocket.recv(1024).decode('utf-8')
-            self.serverSocket.send((str(port)+"$"+matchS).encode('utf-8'))
+            self.serverSocket.send((str(port)+"$"+hostName).encode('utf-8'))
             msg = self.serverSocket.recv(1024).decode('utf-8')
             online = False
             running = False
@@ -178,8 +179,8 @@ class GameServer:
 
     def db_service(self):
         while True: 
-            db_ip = "ec2-54-162-162-190.compute-1.amazonaws.com"
-            db_port = 28041
+            db_ip = "ec2-54-242-253-85.compute-1.amazonaws.com"
+            db_port = 27017
             # Create a new client and connect to the primary server
             mongoClient = MongoClient(db_ip, db_port)
             db = mongoClient.get_database('racingGameDB')
