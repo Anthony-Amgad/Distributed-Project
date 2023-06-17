@@ -95,11 +95,13 @@ def on_new_client(clientsocket, name):
                 else:
                     clientsocket.send("no".encode('utf-8'))
         except:
-            if name in NamesConnected:
+            if NamesConnected[name] != "ingame" or NamesConnected[name] != "disconnected":
+                NamesConnected.pop(name)
+            """if name in NamesConnected:
                 if NamesConnected[name] == 'ingame':
                     NamesConnected[name] = 'disconnected'
                 else:
-                    NamesConnected.pop(name)
+                    NamesConnected.pop(name)"""
             connected = False
             print(name + " dc")
     clientsocket.close()
