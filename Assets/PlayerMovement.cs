@@ -1,7 +1,6 @@
 using UnityEngine;
 using System;
-
-
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -18,6 +17,8 @@ public class PlayerMovement : MonoBehaviour
      private float forwardForce = 2000f;
      private float sidewaysForce = 100f;
 
+     public bool Endless = false;
+     public Text Score;
      private int diststore = 1010;
      private bool rflag = true;
 
@@ -25,9 +26,11 @@ public class PlayerMovement : MonoBehaviour
      float timeToGo;
 
      private void Start() {
-          rend = GetComponent<Renderer>();
-          rend.enabled = true;
-          rend.sharedMaterial = materials[PlayerPrefs.GetInt("playerCount")];
+          if(!Endless){
+               rend = GetComponent<Renderer>();
+               rend.enabled = true;
+               rend.sharedMaterial = materials[PlayerPrefs.GetInt("playerCount")];
+          }
           timeToGo = Time.fixedTime;
      }
 
@@ -72,7 +75,9 @@ public class PlayerMovement : MonoBehaviour
           FindObjectOfType<GameManagerScript>().updateKeyGUI(keys);
           timeToGo = Time.fixedTime + timeOffset;
      }
-
+     if(Endless){
+          Score.text = rb.position.z.ToString("0");
+     }
 
      }
 }

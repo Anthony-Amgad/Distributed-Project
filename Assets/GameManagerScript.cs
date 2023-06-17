@@ -35,15 +35,22 @@ public class GameManagerScript : MonoBehaviour
     public GameObject keysPanel;
     public Text rankText;
 
+    public bool Endless = false;
+
 
     void Awake()
-    {
+    {   
         Play.SetActive(true);
-        FindObjectOfType<SecondServerSocketScript>().onSecondSceeneLoad(Players);
-        List<String> Names = StringsListFromString(PlayerPrefs.GetString("Players"));
-        for(int i = 0; i < Names.Count(); i++){
-            playertags[i].text = Names[i];
+        if(!Endless){
+            FindObjectOfType<SecondServerSocketScript>().onSecondSceeneLoad(Players);
+            List<String> Names = StringsListFromString(PlayerPrefs.GetString("Players"));
+            for(int i = 0; i < Names.Count(); i++){
+                playertags[i].text = Names[i];
+            } 
+        }else{
+            PlayerPrefs.SetInt("seed",Guid.NewGuid().GetHashCode());
         }
+        
 
     }
 
@@ -120,6 +127,11 @@ public class GameManagerScript : MonoBehaviour
 
     public void EndGame(){
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    public void EndEndless(){
+        Destroy(GameObject.Find("FirstServerSocket"));
+        SceneManager.LoadScene(0);
     }
 
     Vector3 Vector3FromString(String Vector3string) {

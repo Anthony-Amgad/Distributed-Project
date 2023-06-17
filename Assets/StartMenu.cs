@@ -54,4 +54,8 @@ public class StartMenu : MonoBehaviour
     FindObjectOfType<FirstServerSocketScript>().StartSearch();
 
     }
+
+    public void StartEndless(){
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 3);
+    }
 }
