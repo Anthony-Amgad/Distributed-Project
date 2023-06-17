@@ -94,6 +94,8 @@ def on_new_client(clientsocket, name):
                     clientsocket.send("ok".encode('utf-8'))
                 else:
                     clientsocket.send("no".encode('utf-8'))
+            elif msgs[0] == "alive":
+                pass
         except:
             if NamesConnected[name] != "ingame" and NamesConnected[name] != "disconnected":
                 NamesConnected.pop(name)
@@ -134,6 +136,7 @@ while True:
         _thread.start_new_thread(on_new_server,(c,(msg[1]+'#'+msg[0])))
     elif msg == "user":
         c.send("ok".encode('utf-8'))
+        c.settimeout(90)
         msg = c.recv(1024).decode('utf-8').lower()
         if msg not in NamesConnected:
             NamesConnected.update({msg : "searching"})
@@ -148,6 +151,7 @@ while True:
                     except:
                         positions = ['(2.2,1.5,0.0)','(-2.7,1.5,0.0)','(-7.8,1.5,0.0)','(7.4,1.5,0.0)']
                     c.send(('ingame$' + key + '$' + str(positions[0]['positions'])).encode('utf-8'))
+                    _thread.start_new_thread(on_new_client,(c,msg))
                     found = 1
                     break
             if found == 1:

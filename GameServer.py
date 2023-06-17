@@ -95,6 +95,7 @@ class GameServer:
                             pass
                     self.state[names_cnt] = "waiting"
                     self.playerSockets.append(c)
+                    c.settimeout(90)
                 _thread.start_new_thread(
                     self.on_new_client, (c, name, names_cnt, alrd))
 
@@ -107,6 +108,7 @@ class GameServer:
         while connected :
             try:
                 msg = clientsocket.recv(1024).decode('utf-8')
+                num = self.names.index(name)
                 if not msg: raise
                 for token in msg.split('~'):
                     if len(token) > 1:
@@ -149,8 +151,10 @@ class GameServer:
                                     except:
                                         pass
             except Exception as e:
+                num = self.names.index(name)
                 print(name + " disconnected" + " : " + str(e))
                 self.state[num] = "disconnected"
+                print(self.state)
                 if not self.game_started:
                     self.playerSockets.remove(clientsocket)
                     self.names.remove(name)

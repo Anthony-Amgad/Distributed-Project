@@ -143,7 +143,7 @@ public class SecondServerSocketScript : MonoBehaviour {
 								newCount = int.Parse(msg[2]);
 								dcN = true;
 							}catch(Exception e){
-
+								dcname = "someone";
 							}	
 						}
 					}

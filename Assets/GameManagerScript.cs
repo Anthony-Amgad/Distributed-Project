@@ -84,9 +84,13 @@ public class GameManagerScript : MonoBehaviour
     }
 
     public void updategpoints(string[] poss, int playernum){
+        try{
         for(int i = 0; i < poss.Length; i+=2){
 				playergpoints[i/2].transform.localPosition = new Vector3(((675*Vector3FromString(poss[i]).z)/6000)-335,(18-(6*i)),0);
 			}
+        }catch(Exception e){
+            
+        }
     }
 
     public void chatView(string chatSender, string chatMessage){
