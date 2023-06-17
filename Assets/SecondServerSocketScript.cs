@@ -138,9 +138,13 @@ public class SecondServerSocketScript : MonoBehaviour {
 							rankings = msg[1];
 							gE = true;
 						}else if(msg[0] == "dc"){
-							dcname = msg[1];
-							newCount = int.Parse(msg[2]);
-							dcN = true;
+							try{
+								dcname = msg[1];
+								newCount = int.Parse(msg[2]);
+								dcN = true;
+							}catch(Exception e){
+
+							}	
 						}
 					}
 				}

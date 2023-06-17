@@ -166,6 +166,7 @@ class GameServer:
                 if (self.state.count("disconnected") + self.state.count("NA")) == 4:
                     self.game_started = False
                     self.names = []
+                    self.finished = 0
                     print(self.names)
                     self.positions = ['(0.0,-4.0,0.0)','(0.0,-6.0,0.0)','(0.0,-8.0,0.0)','(0.0,-10.0,0.0)']
                     self.state = ["NA","NA","NA","NA"]
