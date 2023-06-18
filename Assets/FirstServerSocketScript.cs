@@ -22,6 +22,9 @@ public class FirstServerSocketScript : MonoBehaviour
     public GameObject MatchMakingCanvas;
     public GameObject LobbyCanvas;
 
+    float timeToGo;
+	const float timeOffset = 60f;
+
     const int PORT_NO = 50001;
     const string SERVER_IP = "ec2-44-202-243-81.compute-1.amazonaws.com";
     //private string SERVER_IP = System.Environment.MachineName; //FOR LOCAL RUNS
@@ -38,6 +41,7 @@ public class FirstServerSocketScript : MonoBehaviour
                 ErrorText.SetActive(true);
                 PlayerPrefs.SetString("Connection", "Stable");
             }
+            timeToGo = Time.fixedTime;
         }
     }
 
@@ -47,9 +51,18 @@ public class FirstServerSocketScript : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        if (Time.fixedTime >= timeToGo) {
+            try{
+				byte[] bytesToSend = ASCIIEncoding.ASCII.GetBytes("alive$");
+				nwStream.Write(bytesToSend, 0, bytesToSend.Length);
+				timeToGo = Time.fixedTime + timeOffset;
+            }catch(Exception e){
+
+            }
+		}
+    
     }
 
     public void resetInst(){

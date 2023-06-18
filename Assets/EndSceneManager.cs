@@ -20,18 +20,19 @@ public class EndSceneManager : MonoBehaviour
     void Start()
     {
         string ranking = PlayerPrefs.GetString("ranking");
+        List<String> Names = StringsListFromString(PlayerPrefs.GetString("Players"));
         int c = 3;
         for(int i=0; i < ranking.Length; i++){
             if(int.Parse(ranking[i].ToString())!=0){
                 PlayerCars[int.Parse(ranking[i].ToString())-1].GetComponent<Renderer>().sharedMaterial = materials[i];
+                playerNameTags[int.Parse(ranking[i].ToString())-1].text = Names[i];
             }else{
                 PlayerCars[c--].SetActive(false);
             }
         }
-        List<String> Names = StringsListFromString(PlayerPrefs.GetString("Players"));
-        for(int i = 0; i < Names.Count(); i++){
-            playerNameTags[i].text = Names[i];
-        }
+        //for(int i = 0; i < Names.Count(); i++){
+        //    playerNameTags[i].text = Names[i];
+        //}
     }
 
     // Update is called once per frame

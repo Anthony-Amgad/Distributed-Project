@@ -75,6 +75,9 @@ public class PlayerMovement : MonoBehaviour
           FindObjectOfType<GameManagerScript>().updateKeyGUI(keys);
           timeToGo = Time.fixedTime + timeOffset;
      }
+     if(trans.position.y < -8){
+          trans.position = new Vector3(0,2,trans.position.z+50);
+     }
      if(Endless){
           Score.text = rb.position.z.ToString("0");
      }
