@@ -38,4 +38,4 @@ python3 GameServer.py
 
 <em><b>Alternatively, you can run the compiled version attached to directly play online.</b></em>
 
-## [Youtube Demo Video, Press Here](https://www.youtube.com/)
+## [Youtube Demo Video, Press Here](https://youtu.be/hVoL1KevE1g)
