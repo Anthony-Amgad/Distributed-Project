@@ -211,7 +211,7 @@ class GameServer:
 #MAIN
 if __name__ == "__main__":
     gS = []
-    for i, j in enumerate(range(50002, 50003)):
+    for i, j in enumerate(range(50002, 50006)):
         gS.append(GameServer())
         _thread.start_new_thread(gS[i].startGameServer, tuple([j]))
     
